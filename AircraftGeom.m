@@ -10,10 +10,10 @@ classdef AircraftGeom
 			ag.aeroSurfaces = aeroSurfaces;
 		end
 		function L = calcLift(ag, q_inf)
-			L = sum(aeroSurfaces.calcLift);
+			L = sum(aeroSurfaces.calcLift());
 		end
 		function D = calcDrag(ag, q_inf)
-			D = sum(aeroSurfaces.calcDrag);
+			D = sum(aeroSurfaces.calcDrag());
 		end	
 	end
 end
