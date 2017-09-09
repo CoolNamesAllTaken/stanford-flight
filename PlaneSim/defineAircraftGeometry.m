@@ -1,5 +1,5 @@
 function geom = defineAircraftGeometry(aircraftName)
-	if (strcmpi(aircraftName, 'dbf16'))
+	if (strcmpi(aircraftName, 'dbf17'))
 		wing_b = 2;
 		wing_S = 0.26;
 		wing_C_L = 0.4; % cruise C_L
