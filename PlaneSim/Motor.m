@@ -1,47 +1,46 @@
 classdef Motor
 	properties
-		% TODO: change these to pairs
-		e_prop % propeller efficiency factor at cruise
-		e_motor % motor efficiency factor at cruise
-		T_max_static % [N] motor max thrust when static
-		T_max_cruise % [N] motor max thrust at cruise
-		v_inf_cruise % [m/s] cruise velocity for T_max_cruise
+		v_inf % [m/s] freestream velocity for other properties [idle, cruise]
+		T % [N] motor max thrust [idle, cruise]
+		e_prop % propeller efficiency factor [idle, cruise]
+		e_motor % motor efficiency factor
 	end
 	methods
-		function m = Motor(e_prop, e_motor)
-		% m = Motor(e_prop, e_motor) creates a motor object with propeller efficiency e_prop and motor
-		% efficiency e_motor
+		function m = Motor(v_inf, T, e_prop, e_motor)
+		% m = Motor(e_prop, e_motor, T, v_inf) creates a motor object.  NOTE: v_inf, T, e_prop are variable
+		% arrays used to interpret motor properties for all phases of flight.  Recommend at least two values
+		% per input, in the form [idle, cruise]
+		%	v_inf = [m/s] freestream velocity for other properties
+		%	T = [N] motor max thrust
 		%	e_prop = propeller efficiency factor at cruise (thrust power / shaft power)
 		%	e_motor = motor efficiency factor at cruise (shaft power / electric power)
-		%	TODO: finish this comment
+			m.v_inf = v_inf;
+			m.T = T;
 			m.e_prop = e_prop;
 			m.e_motor = e_motor;
-			m.T_max_static = T_max_static;
-			m.T_max_cruise = T_max_cruise;
-			m.v_inf_cruise = v_inf_cruise;
 		end
 
-		function thrust = calcThrust(v_inf)
+		function thrust = calcThrust(m, v_inf)
 		% thrust = m.calcThrust(v_inf) calculates the thrust produced by the motor m at a given speed v_inf,
 		% assuming throttle is at 100% (interpolates between static thrust and cruise thrust values)
-			v_infBounds = [0, v_inf_cruise];
-			thrustBounds = [T_max_static T_max_cruise];
-			thrust = interp1(v_infBounds, thrustBounds, v_inf);
-		end
-
-		function motorPower = calcMotorPower(thrust, v_inf)
-		% motorPower = m.calcMotorPower(thrust, v_inf) calculates the shaft power of the motor m motorPower,
-		% required to create thrust force thrust at cruise speed v_inf
-		%	thrust = [N] thrust force
 		%	v_inf = [m/s] cruise speed
-			motorPower = thrust .* v_inf ./ e_prop;
+			thrust = interp1(m.v_inf, m.T, v_inf);
 		end
 
-		function battPower = calcBattPower(motorPower)
+		function motorPower = calcMotorPower(m, v_inf, T)
+		% motorPower = m.calcMotorPower(v_inf, T) calculates the shaft power of the motor m motorPower,
+		% required to create thrust force T at cruise speed v_inf
+		%	v_inf = [m/s] cruise speed
+		%	T = [N] thrust force
+			e_prop = interp1(m.v_inf, m.e_prop, v_inf);
+			motorPower = T .* v_inf ./ e_prop;
+		end
+
+		function battPower = calcBattPower(m, motorPower)
 		% battPower = m.calcBattPower(motorPower) calculates the electrical power provided provided by the
 		% batteries to a motor m producing motorPower watts of shaft power
 		%	motorPower = [W] motor shaft power
-			battPower = motorPower ./ e_motor;
+			battPower = motorPower ./ m.e_motor;
 		end
 	end
 end
