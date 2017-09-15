@@ -20,11 +20,18 @@ classdef Motor
 			m.e_motor = e_motor;
 		end
 
-		function thrust = calcThrust(m, v_inf)
+		function [thrust battPower] = calcPropulsion(m, v_inf, throttle)
+			thrust = m.calcThrust(v_inf, throttle);
+			motorPower = m.calcMotorPower(v_inf, thrust);
+			battPower = m.calcBattPower(motorPower);
+		end
+
+		function thrust = calcThrust(m, v_inf, throttle)
 		% thrust = m.calcThrust(v_inf) calculates the thrust produced by the motor m at a given speed v_inf,
-		% assuming throttle is at 100% (interpolates between static thrust and cruise thrust values)
+		% assuming thrust scales linearly with throttle (interpolates between static thrust and cruise thrust values)
 		%	v_inf = [m/s] cruise speed
-			thrust = interp1(m.v_inf, m.T, v_inf);
+		%	throttle = throttle value between 0 and 1
+			thrust = interp1(m.v_inf, m.T, v_inf) .* throttle;
 		end
 
 		function motorPower = calcMotorPower(m, v_inf, T)
