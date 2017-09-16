@@ -30,10 +30,10 @@ classdef AircraftGeom
 				T = T + motors{i}.calcThrust(v_inf, throttle);
 			end
 		end
-		function values = calcPropulsion(ag, v_inf)
-			values = [0 0] % [T battPower], measured in [N] and [W]
+		function ret = calcPropulsion(ag, v_inf)
+			ret = [0 0] % [T battPower], measured in [kg] and [W]
 			for i = 1:length(motors)
-				values = values + motors{i}.calcPropulsion(v_inf, throttle);
+				ret = ret + motors{i}.calcPropulsion(v_inf, throttle);
 			end
 		end
 	end

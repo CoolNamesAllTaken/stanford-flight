@@ -1,7 +1,7 @@
 classdef Motor
 	properties
 		v_inf % [m/s] freestream velocity for other properties [idle, cruise]
-		T % [N] motor max thrust [idle, cruise]
+		T % [kg] motor max thrust [idle, cruise]
 		e_prop % propeller efficiency factor [idle, cruise]
 		e_motor % motor efficiency factor
 	end
@@ -11,19 +11,20 @@ classdef Motor
 		% arrays used to interpret motor properties for all phases of flight.  Recommend at least two values
 		% per input, in the form [idle, cruise]
 		%	v_inf = [m/s] freestream velocity for other properties
-		%	T = [N] motor max thrust
-		%	e_prop = propeller efficiency factor at cruise (thrust power / shaft power)
-		%	e_motor = motor efficiency factor at cruise (shaft power / electric power)
+		%	T = [kg] motor max thrust
+		%	e_prop = [kg/W] propeller specific thrust
+		%	e_motor = [unitless] motor efficiency factor at cruise (shaft power / electric power)
 			m.v_inf = v_inf;
 			m.T = T;
 			m.e_prop = e_prop;
 			m.e_motor = e_motor;
 		end
 
-		function [thrust battPower] = calcPropulsion(m, v_inf, throttle)
+		function ret = calcPropulsion(m, v_inf, throttle)
 			thrust = m.calcThrust(v_inf, throttle);
 			motorPower = m.calcMotorPower(v_inf, thrust);
 			battPower = m.calcBattPower(motorPower);
+			ret = [thrust battPower];
 		end
 
 		function thrust = calcThrust(m, v_inf, throttle)
@@ -38,9 +39,9 @@ classdef Motor
 		% motorPower = m.calcMotorPower(v_inf, T) calculates the shaft power of the motor m motorPower,
 		% required to create thrust force T at cruise speed v_inf
 		%	v_inf = [m/s] cruise speed
-		%	T = [N] thrust force
+		%	T = [kg] thrust force
 			e_prop = interp1(m.v_inf, m.e_prop, v_inf);
-			motorPower = T .* v_inf ./ e_prop;
+			motorPower = T ./ e_prop;
 		end
 
 		function battPower = calcBattPower(m, motorPower)
