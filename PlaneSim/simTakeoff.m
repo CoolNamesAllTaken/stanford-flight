@@ -2,7 +2,7 @@ aircraftName = 'LittlePuckerTakeoff';
 rho = 1.1; % [kg/m^2] kansas-ish
 
 units = loadUnits();
-TIME_STEP = 0.5; % [s] time between updates
+TIME_STEP = 0.1; % [s] time between updates
 
 geom = defineAircraftGeometry(aircraftName);
 state = AircraftState();
@@ -19,13 +19,13 @@ L = [];
 
 while (currL < geom.mass .* units.KG_2_N)
 	currTime = currTime + TIME_STEP;
-	currv_inf = state.calcv_inf();
+	currv_inf = state.calcv_inf()
 	currq_inf = 0.5 .* rho .* currv_inf^2;
-	currThrust = geom.calcThrust(currv_inf, 1);
+	currThrust = geom.calcThrust(currv_inf, 1)
 	currL = geom.calcLift(currq_inf);
 	currD = geom.calcDrag(currq_inf);
-	acc = [0 ((currThrust - currD) ./ geom.mass) 0]; % runway is eastwards
-	currVel = currVel + (acc .* TIME_STEP);
+	acc = [0 ((currThrust - currD) ./ geom.mass) 0] % runway is eastwards
+	currVel = currVel + (acc .* TIME_STEP)
 
 	state.pos = state.pos + (currVel .* TIME_STEP); 
 	state.vel = currVel;
@@ -56,7 +56,7 @@ grid on;
 
 figure();
 subplot(4, 1, 1);
-plot(time, pos);
+plot(time, pos(:, 2));
 ylabel('Pos [m]')
 
 subplot(4, 1, 2);

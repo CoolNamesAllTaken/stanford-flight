@@ -14,7 +14,7 @@ classdef AircraftState
 		end
 		function v_inf = calcv_inf(as)
 			% TODO: account for wind
-			v_inf = sum(as.vel .* [1 1 0] .^ 2); % freestream velocity in XY (NE) plane
+			v_inf = sqrt(sum(as.vel .^ 2)); % freestream velocity in combines XY vel with ascent rate
 		end
 		function as = update(as, timeStep)
 			as.pos = as.pos + (as.vel .* timeStep);
