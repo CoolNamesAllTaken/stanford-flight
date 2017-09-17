@@ -7,8 +7,10 @@ classdef AircraftState
 	end
 	methods  
 		function as = AircraftState(pos, vel)
-			as.pos = pos;
-			as.vel = vel;
+			if (nargin == 2)
+				as.pos = pos;
+				as.vel = vel;
+			end
 		end
 		function v_inf = calcv_inf(as)
 			% TODO: account for wind

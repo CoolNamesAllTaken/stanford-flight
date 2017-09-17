@@ -7,7 +7,7 @@ function geom = defineAircraftGeometry(aircraftName)
 		% cruise conditions
 		v_inf = 13.06; % [m/s]
 		rho = 1.1; % [kg/m^2] kansas-ish
-		q_inf = 0.5 * rho * v_inf^2;
+		q_inf = 0.5 .* rho .* v_inf^2;
 
 		wing1_b = 1.27;
 		wing1_S = 0.18;
@@ -29,11 +29,6 @@ function geom = defineAircraftGeometry(aircraftName)
 		geom = AircraftGeom('Little Pucker', mass, liftSurfaces, dragSurfaces, {motor});
 	elseif (strcmpi(aircraftName, 'LittlePuckerTakeoff'))
 		mass = 1.97; % [kg]
-
-		% cruise conditions
-		v_inf = 13.06; % [m/s]
-		rho = 1.1; % [kg/m^2] kansas-ish
-		q_inf = 0.5 * rho * v_inf^2;
 
 		wing1_b = 1.27;
 		wing1_S = 0.18;
