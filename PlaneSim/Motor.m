@@ -24,7 +24,7 @@ classdef Motor
 			thrust = m.calcThrust(v_inf, throttle);
 			motorPower = m.calcMotorPower(v_inf, thrust);
 			battPower = m.calcBattPower(motorPower);
-			ret = [thrust battPower];
+			ret = [thrust battPower]; % [kg, W]
 		end
 
 		function thrust = calcThrust(m, v_inf, throttle)

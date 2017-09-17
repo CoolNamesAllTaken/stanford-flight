@@ -1,7 +1,7 @@
-units = units();
+units = loadUnits();
 
 v_inf = [0 13.06]; % [m/s] static, cruise
-T = [1204 0.239]; % [N] static, cruise
+T = [1.204 0.239]; % [N] static, cruise
 e_prop = [0.0048 0.00307]; % [kg/W] static, cruise
 e_motor = 0.795; % static and cruise
 
