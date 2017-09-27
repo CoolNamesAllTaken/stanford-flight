@@ -1,20 +1,24 @@
-aircraftName_climb = 'LittlePuckerClimb';
-aircraftName_cruise = 'LittlePuckerCruise';
-aircraftName_descend = 'LittlePuckerDescend';
+aircraftName = 'LittlePucker'
 
 units = loadUnits();
 TIME_STEP = 0.1; % [s] time between updates
-NUM_STEPS = 200;
+NUM_STEPS = 500;
 
-geom_climb = defineAircraftGeometry(aircraftName_climb);
-geom_cruise = defineAircraftGeometry(aircraftName_cruise);
-geom_descend = defineAircraftGeometry(aircraftName_descend);
+geom = defineAircraftGeometry(aircraftName);
 
 CRUISE_ALT = 20; % [m]
 ALT_ERR = 5; % [m]
 
+COURSE_EDGE = 100; % [m] first pylon distance, fudged
+MAX_BANK = pi/4 % [rad], limit to 45 degree bank
+
+% control loop gains
+P_alt = 0.008;
+D_alt = 0.05;
+
 state = AircraftState();
 state.rho = 1.1; % [kg/m^2] kansas-ish
+state.vel = [0 0.1 0]; % start aircraft rolling down runway (heading established)
 
 currTime = 0;
 
@@ -22,48 +26,57 @@ time = [];
 pos = [];
 vel = [];
 gamma = [];
+phi = [];
+hdg = [];
 v_inf = [];
 thrust = [];
 L = [];
-Fz = [];
-Fx = [];
+F_xyz = [];
 
 commandAlt = CRUISE_ALT;
 
 % while (currL < geom.mass .* units.KG_2_N)
 for (i=1:NUM_STEPS)
 	config = [];
-	if (state.pos(3) < commandAlt - ALT_ERR)
-		% climb to cruise alt
-		config = 'climb'
-	elseif(state.pos(3) > commandAlt + ALT_ERR)
-		% descend to cruise alt
-		config = 'descend'
-	else
-		config = 'cruise'
-	end
 
-	geom = [];
-	if (strcmpi(config, 'climb'))
-		geom = geom_climb;
-	elseif (strcmpi(config, 'cruise'))
-		geom = geom_descend;
-	elseif(strcmpi(config, 'descend'))
-		geom = geom_descend;
+	% proportional altitude control loop
+	altErr = state.pos(3) - commandAlt;
+	dAltErr = state.vel(3);
+	response = altErr * P_alt + dAltErr * D_alt;
+
+	liftMult = geom.liftMult - response;
+	if (liftMult > 1)
+		liftMult = 1;
+	elseif (liftMult < 0)
+		liftMult = 0;
+	end
+	geom.liftMult = liftMult;
+
+	% crappy heading control loop
+	if (state.pos(2) > COURSE_EDGE)
+		state.phi = MAX_BANK;
 	end
 
 	% update current state variables
 	currTime = currTime + TIME_STEP;
-	currv_inf = state.calcv_inf()
-	currq_inf = state.calcq_inf();
-	currT = geom.calcThrust(currv_inf, 1)
-	currL = geom.calcLift(currq_inf);
-	currD = geom.calcDrag(currq_inf);
-	currgamma = state.calcgamma();
-	currFx = ((currT - currD) .* cos(currgamma)) - (currL .* sin(currgamma));
-	currFz = (currL .* cos(currgamma)) + ((currT - currD) .* sin(currgamma)) - (geom.mass .* units.KG_2_N);
 
-	state.acc = [0, (currFx ./ geom.mass), (currFz ./ geom.mass)] % runway is eastwards
+	% transforms longitudinal forces (ie. thrust, drag) from XYZ coords to NEU coords
+	transform_long = [cos(state.gamma), (sin(state.gamma) * sin(state.phi)), (sin(state.gamma) * cos(state.phi))];
+	% transforms vertical forces (ie. lift) from XYZ coords to NEU coords
+	transform_vert = [-sin(state.gamma), (cos(state.gamma) * sin(state.phi)), (cos(state.gamma) * cos(state.phi))];
+
+	currT = geom.calcThrust(state.v_inf, 1) .* transform_long % [T_x T_y T_z]
+	currL = geom.calcLift(state.q_inf) .* transform_vert; % [L_x L_y L_z]
+	currD = -geom.calcDrag(state.q_inf) .* transform_long; % [D_x D_y D_z]
+	currW = [0, 0, -(geom.mass * units.KG_2_N)]; % [W_x W_y W_z]
+	
+	% currFx = ((currT - currD) .* cos(state.gamma)) - (currL .* sin(state.gamma));
+	% currFz = (currL .* cos(state.gamma)) + ((currT - currD) .* sin(state.gamma)) - (geom.mass .* units.KG_2_N);
+
+	currF_xyz = currT + currL + currD + currW;
+	currF_neu = currF_xyz * [cos(state.hdg), -sin(state.hdg), 0; sin(state.hdg), cos(state.hdg), 0; 0, 0, 1];
+
+	state.acc = currF_neu ./ geom.mass % runway is eastwards
 	state = state.update(TIME_STEP);
 
 	if (state.pos(3) <= 0 && state.vel(3) < 0)
@@ -77,12 +90,13 @@ for (i=1:NUM_STEPS)
 	time = vertcat(time, currTime);
 	pos = vertcat(pos, state.pos);
 	vel = vertcat(vel, state.vel);
-	gamma = vertcat(gamma, currgamma);
-	v_inf = vertcat(v_inf, currv_inf);
-	thrust = vertcat(thrust, currT);
-	L = vertcat(L, currL);
-	Fz = vertcat(Fz, currFz);
-	Fx = vertcat(Fx, currFx);
+	gamma = vertcat(gamma, state.gamma);
+	phi = vertcat(phi, state.phi);
+	hdg = vertcat(hdg, state.hdg);
+	v_inf = vertcat(v_inf, state.v_inf);
+	thrust = vertcat(thrust, sqrt(sum(currT.^2)));
+	L = vertcat(L, sqrt(sum(currL.^2)));
+	F_xyz = vertcat(F_xyz, currF_xyz);
 end
 
 close all;
@@ -166,15 +180,38 @@ xlabel('Time [s]');
 figure('name', 'Forces');
 a = gobjects(0);
 
-a = vertcat(a, subplot(2, 1, 1));
-plot(time, Fz(:, 1));
+a = vertcat(a, subplot(3, 1, 1));
+plot(time, F_xyz(:, 1));
 grid on;
-ylabel('Fz [N]');
+ylabel('F_x [N]');
 
-a = vertcat(a, subplot(2, 1, 2));
-plot(time, Fx(:, 1));
+a = vertcat(a, subplot(3, 1, 2));
+plot(time, F_xyz(:, 2));
 grid on;
-ylabel('Fx [N]');
+ylabel('F_y [N]');
+
+a = vertcat(a, subplot(3, 1, 3));
+plot(time, F_xyz(:, 3));
+grid on;
+ylabel('F_z [N]');
 
 linkaxes(a, 'x');
 xlabel('Time [s]');
+
+figure('name', 'Angles');
+a = gobjects(0);
+
+a = vertcat(a, subplot(3, 1, 1));
+plot(time, gamma(:, 1));
+grid on;
+ylabel('gamma [rad]');
+
+a = vertcat(a, subplot(3, 1, 2));
+plot(time, phi(:, 1));
+grid on;
+ylabel('phi [rad]');
+
+a = vertcat(a, subplot(3, 1, 3));
+plot(time, hdg(:, 1));
+grid on;
+ylabel('heading [rad]');

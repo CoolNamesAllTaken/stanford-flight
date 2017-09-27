@@ -2,15 +2,17 @@ classdef LiftSurface
 	properties
 		b % [m] span
 		S % [m^2] reference area
-		C_L % coefficient of lift
+		C_Lmax % coefficient of lift in aircraft max-lift config
 		C_D0 % coefficient of drag at zero lift
 		e % efficiency factor (1 for an ellipse, 0.8-0.9 for most aircraft)
+		mult = 1;
 	end
 	properties (Dependent)
 		AR % aspect ratio, dependent on b and S
+		C_L % coefficient of lift, dependent on C_Lmax and multiplier
 	end
 	methods
-		function lsurf = LiftSurface(b, S, C_L, C_D0, e)
+		function lsurf = LiftSurface(b, S, C_Lmax, C_D0, e)
 		% lsurf = LiftSurface(b, S, C_L, C_D0, e) creates a new LiftSurface object lsurf, which represents a wing
 		% or lift-generating horizontal stabilizer on an aircraft.
 		%	b = [m] span
@@ -20,7 +22,7 @@ classdef LiftSurface
 		%	e = efficiency factor (1 for an ellipse, 0.8-0.9 for most aircraft)
 			lsurf.b = b;
 			lsurf.S = S;
-			lsurf.C_L = C_L;
+			lsurf.C_Lmax = C_Lmax;
 			lsurf.C_D0 = C_D0;
 			lsurf.e = e;
 		end
@@ -28,6 +30,10 @@ classdef LiftSurface
 		function AR = get.AR(lsurf)
 		% lsurf.AR calculates and returns the dependent variable for Aspect Ratio; AR updates with lsurf.b and lsurf.S
 			AR = lsurf.b.^2 ./ lsurf.S; % calculate and store aspect ratio
+		end
+		function C_L = get.C_L(lsurf)
+		% lsurf.C_L calculates and returns the coefficient of lift (C_Lmax scaled by multiplier)
+			C_L = lsurf.C_Lmax .* lsurf.mult;
 		end
 
 		function D = calcDrag(lsurf, q_inf)

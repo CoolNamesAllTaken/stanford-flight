@@ -3,6 +3,7 @@ classdef AircraftGeom
 		name = '';
 		mass = 0; % [kg] mass of aircraft (AUW)
 
+		liftMult = 1;
 		liftSurfaces = {};
 		dragSurfaces = {};
 		motors = {};
@@ -15,6 +16,14 @@ classdef AircraftGeom
 			ag.dragSurfaces = dragSurfaces;
 			ag.motors = motors
 		end
+
+		function ag = set.liftMult(ag, liftMult)
+			for i = 1:length(ag.liftSurfaces)
+				ag.liftSurfaces{i}.mult = liftMult;
+			end
+			ag.liftMult = liftMult;
+		end
+
 		function L = calcLift(ag, q_inf)
 			L = 0;
 			for i = 1:length(ag.liftSurfaces)
