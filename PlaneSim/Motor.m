@@ -14,9 +14,10 @@ classdef Motor
 		%	T = [kg] motor max thrust
 		%	e_prop = [kg/W] propeller specific thrust
 		%	e_motor = [unitless] motor efficiency factor at cruise (shaft power / electric power)
-			m.v_inf = v_inf;
-			m.T = T;
-			m.e_prop = e_prop;
+			% motor produces 0 thrust at infinite speed (avoid issues when flying faster than pitch speed)
+			m.v_inf = [v_inf, 999999999];
+			m.T = [T, 0];
+			m.e_prop = [e_prop, 0];
 			m.e_motor = e_motor;
 		end
 
