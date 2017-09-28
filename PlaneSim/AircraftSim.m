@@ -27,7 +27,7 @@ classdef AircraftSim
 			% transformation matrices
 			AC_LONG_2_XYZ = [cos(as.state.gamma), (sin(as.state.gamma) * sin(as.state.phi)), (sin(as.state.gamma) * cos(as.state.phi))];
 			AC_VERT_2_XYZ = [-sin(as.state.gamma), (cos(as.state.gamma) * sin(as.state.phi)), (cos(as.state.gamma) * cos(as.state.phi))];
-			XYZ_2_NEU = [cos(as.state.hdg), -sin(as.state.hdg), 0; sin(as.state.hdg), cos(as.state.hdg), 0; 0, 0, 1];
+			XYZ_2_NEU = [cos(as.state.hdg), sin(as.state.hdg), 0; -sin(as.state.hdg), cos(as.state.hdg), 0; 0, 0, 1];
 
 			% update current state variables
 			as.time = as.time + timeStep;

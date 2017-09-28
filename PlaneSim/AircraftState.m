@@ -55,11 +55,11 @@ classdef AircraftState
 					hdg = pi; % south
 				end
 			elseif (as.vel(2) > 0)
-				% moving east-ish, pi-2pi
-				hdg = 3*pi/2 + atan(as.vel(1) / as.vel(2));
+				% moving east-ish, 0-pi
+				hdg = pi/2 - atan(as.vel(1) / as.vel(2));
 			else
-				% moving west-ish, 0-pi
-				hdg = pi/2 + atan(as.vel(1) / as.vel(2));
+				% moving west-ish, pi-2pi
+				hdg = 3*pi/2 - atan(as.vel(1) / as.vel(2));
 			end
 		end
 
@@ -73,9 +73,9 @@ classdef AircraftState
 			end
 			hdgDiff = hdg - as.hdg;
 			if (hdgDiff > pi)
-				hdgDiff = (2 * pi) - hdgDiff;
+				hdgDiff = (-2 * pi) + hdgDiff;
 			elseif (hdgDiff < -pi)
-				hdgDiff = (-2 * pi) - hdgDiff;
+				hdgDiff = (2 * pi) + hdgDiff;
 			end
 		end
 	end
