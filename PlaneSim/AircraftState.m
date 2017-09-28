@@ -49,7 +49,6 @@ classdef AircraftState
 			hdg = 3 * pi / 2;
 			if (as.vel(2) == 0)
 				% moving directly north or south
-				disp('ns')
 				if (as.vel(1) > 0)
 					hdg = 0; % north
 				else
@@ -57,11 +56,9 @@ classdef AircraftState
 				end
 			elseif (as.vel(2) > 0)
 				% moving east-ish, pi-2pi
-				disp('east-ish')
 				hdg = 3*pi/2 + atan(as.vel(1) / as.vel(2));
 			else
 				% moving west-ish, 0-pi
-				disp('west-ish')
 				hdg = pi/2 + atan(as.vel(1) / as.vel(2));
 			end
 		end
@@ -69,6 +66,17 @@ classdef AircraftState
 		function as = update(as, timeStep)
 			as.pos = as.pos + (as.vel .* timeStep);
 			as.vel = as.vel + (as.acc .* timeStep);
+		end
+		function hdgDiff = calcHdgDiff(as, hdg)
+			if (hdg < 0 || hdg > 2 * pi)
+				error(['Heading ' num2str(hdg) ' is out of range.']);
+			end
+			hdgDiff = hdg - as.hdg;
+			if (hdgDiff > pi)
+				hdgDiff = (2 * pi) - hdgDiff;
+			elseif (hdgDiff < -pi)
+				hdgDiff = (-2 * pi) - hdgDiff;
+			end
 		end
 	end
 end
