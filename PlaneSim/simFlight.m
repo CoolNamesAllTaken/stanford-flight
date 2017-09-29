@@ -5,14 +5,11 @@ units = loadUnits();
 TIME_STEP = 0.1; % [s] time between updates
 NUM_STEPS = 500;
 
-geom = defineAircraftGeometry(aircraftName);
-
 CRUISE_ALT = 20; % [m]
 CRUISE_V_INF = 20; % [m/s], estimate used to calculate phi_max
 RHO = 1.1; % [kg/m^3], kansas-ish
 
 PYLON_DIST = 500 / units.M_2_FT; % [m] pylon distance from start line
-PHI_MAX = geom.calcphi_max(0.5 * RHO * CRUISE_V_INF^2); % [rad], limit to 60 degree bank
 
 % control loop gains
 P_alt = 0.1;
@@ -20,23 +17,26 @@ D_alt = 0.3;
 P_hdg = 0.5;
 D_hdg = 0.5;
 
+geom = defineAircraftGeometry(aircraftName);
+
 state = AircraftState();
 state.rho = RHO;
 state.vel = [0 0.1 0]; % start aircraft rolling down runway (heading established)
 
-sim = AircraftSim(state, geom);
+controller = AircraftController(P_alt, D_alt, P_hdg, D_hdg);
+controller.PHI_MAX = geom.calcphi_max(0.5 * RHO * CRUISE_V_INF^2);
+
+sim = AircraftSim(state, geom, controller);
+sim.commandAlt = CRUISE_ALT;
+sim.commandHdg = pi/2;
 
 currStage = 0; % 0 = takeoff; 1 = pylon #1a; 1.5 = pylon #1b; 2, 2.5 = 360 turn; 3 = pylon #2a; 3.5 = pylon #2b
-
-commandAlt = CRUISE_ALT;
-commandHdg = pi/2;
-oldHdg = commandHdg;
 
 for (i=1:NUM_STEPS)
 	config = [];
 
 	% command loop
-	commandHdg = sim.state.calcHdgToPos([0, PYLON_DIST])
+	sim.commandHdg = sim.state.calcHdgToPos([0, PYLON_DIST])
 	% if (currStage == 0)
 	% 	commandHdg = pi/2;
 	% 	currStage = 1;
@@ -70,27 +70,6 @@ for (i=1:NUM_STEPS)
 	% if (sim.state.pos(2) > PYLON_DIST)
 	% 	commandHdg = 3 * pi/2;
 	% end
-
-	% PD altitude control loop
-	altErr = sim.state.pos(3) - commandAlt;
-	dAltErr = sim.state.vel(3);
-	response = altErr * P_alt + dAltErr * D_alt;
-
-	liftMult = sim.geom.liftMult - response;
-	if (liftMult > 1) liftMult = 1;
-	elseif (liftMult < 0) liftMult = 0; end
-	sim.geom.liftMult = liftMult;
-
-	% PD heading control loop
-	hdgErr = sim.state.calcHdgDiff(commandHdg);
-	dHdgErr = sim.state.calcHdgDiff(oldHdg) / TIME_STEP;
-	oldHdg = sim.state.hdg;
-	response = hdgErr * P_hdg + dHdgErr * D_hdg;
-
-	phi = sim.state.phi + response;
-	if (phi > PHI_MAX) phi = PHI_MAX;
-	elseif (phi < -PHI_MAX) phi = -PHI_MAX; end
-	sim.state.phi = phi;
 
 	sim = sim.update(TIME_STEP);
 end
