@@ -22,7 +22,7 @@ D_hdg = 0.5;
 
 state = AircraftState();
 state.rho = RHO;
-state.vel = [0 10 0]; % start aircraft rolling down runway (heading established)
+state.vel = [0 0.1 0]; % start aircraft rolling down runway (heading established)
 
 sim = AircraftSim(state, geom);
 
@@ -36,36 +36,37 @@ for (i=1:NUM_STEPS)
 	config = [];
 
 	% command loop
-	if (currStage == 0)
-		commandHdg = pi/2;
-		currStage = 1;
-	elseif (currStage == 1 && sim.state.pos(2) > PYLON_DIST)
-		commandHdg = 0;
-		currStage = 1.5;
-	elseif (currStage == 1.5)
-		commandHdg = 3 * pi/2;
-		currStage = 2;
-	elseif (currStage == 2 && sim.state.pos(2) < 0)
-		commandHdg = 0;
-		currStage = 2.25;
-	elseif (currStage == 2.25)
-		commandHdg = pi/2;
-		currStage == 2.5;
-	elseif (currStage == 2.5)
-		commandHdg = pi;
-		currStage == 2.75
-	elseif (currStage == 2.75)
-		commandHdg = 3 * pi/2;
-		currStage == 2.9;
-	elseif (currStage == 2.9)
-		commandHdg = 0;
-		currStage = 3;
-	elseif (currStage == 3 && sim.state.pos(2) < -PYLON_DIST)
-		commandHdg = pi;
-		currStage = 2.5;
-	elseif (currStage == 3.5)
-		commandHdg = pi/2
-	end
+	commandHdg = sim.state.calcHdgToPos([0, PYLON_DIST])
+	% if (currStage == 0)
+	% 	commandHdg = pi/2;
+	% 	currStage = 1;
+	% elseif (currStage == 1 && sim.state.pos(2) > PYLON_DIST)
+	% 	commandHdg = 0;
+	% 	currStage = 1.5;
+	% elseif (currStage == 1.5)
+	% 	commandHdg = 3 * pi/2;
+	% 	currStage = 2;
+	% elseif (currStage == 2 && sim.state.pos(2) < 0)
+	% 	commandHdg = 0;
+	% 	currStage = 2.25;
+	% elseif (currStage == 2.25)
+	% 	commandHdg = pi/2;
+	% 	currStage == 2.5;
+	% elseif (currStage == 2.5)
+	% 	commandHdg = pi;
+	% 	currStage == 2.75
+	% elseif (currStage == 2.75)
+	% 	commandHdg = 3 * pi/2;
+	% 	currStage == 2.9;
+	% elseif (currStage == 2.9)
+	% 	commandHdg = 0;
+	% 	currStage = 3;
+	% elseif (currStage == 3 && sim.state.pos(2) < -PYLON_DIST)
+	% 	commandHdg = pi;
+	% 	currStage = 2.5;
+	% elseif (currStage == 3.5)
+	% 	commandHdg = pi/2
+	% end
 	% if (sim.state.pos(2) > PYLON_DIST)
 	% 	commandHdg = 3 * pi/2;
 	% end
@@ -81,7 +82,7 @@ for (i=1:NUM_STEPS)
 	sim.geom.liftMult = liftMult;
 
 	% PD heading control loop
-	hdgErr = sim.state.calcHdgDiff(commandHdg)
+	hdgErr = sim.state.calcHdgDiff(commandHdg);
 	dHdgErr = sim.state.calcHdgDiff(oldHdg) / TIME_STEP;
 	oldHdg = sim.state.hdg;
 	response = hdgErr * P_hdg + dHdgErr * D_hdg;

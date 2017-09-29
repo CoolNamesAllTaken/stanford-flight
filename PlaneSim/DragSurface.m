@@ -1,14 +1,15 @@
 classdef DragSurface
 	properties
 		S % [m^2] reference area
-		C_D0 % zero-lift coefficient of drag
+		C_D % coefficient of drag
 	end
 	methods
-		function dsurf = DragSurface(C_D0)
-			dsurf.C_D0 = C_D0;
+		function dsurf = DragSurface(S, C_D)
+			dsurf.S = S;
+			dsurf.C_D = C_D;
 		end
 		function D = calcDrag(dsurf, q_inf)
-			D = q_inf .* dsurf.S .* dsurf.C_D0;
+			D = q_inf .* dsurf.S .* dsurf.C_D;
 		end
 	end
 end

@@ -18,7 +18,10 @@ function geom = defineAircraftGeometry(aircraftName)
 		wing2 = LiftSurface(wing1_b, wing1_S, wing1_C_Lmax, wing1_C_D0, wing1_e);
 		liftSurfaces = {wing1, wing2};
 
-		dragSurfaces = {};
+		fuse_C_D = 2.1; % rectangular box
+		fuse_A = 0.0075; %[m^2] frontal area
+		fuse = DragSurface(fuse_A, fuse_C_D);
+		dragSurfaces = {fuse};
 
 		motor_v_inf = [0 13.06 26.11]; % [m/s] static, cruise
 		motor_T = [1.204 0.239 0]; % [N] static, cruise
