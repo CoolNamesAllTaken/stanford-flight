@@ -10,6 +10,11 @@ classdef AircraftSim
 		time = 0; % [s]
 
 		data % contains states, etc of past simulation times
+
+		TIME_STEP = 0.1; % [s] time step for linear simulation
+		TIMEOUT_NUM_STEPS = 500; % max number of time steps before timeout
+		WAYPOINT_HIT_RADIUS = 10; % [m] how close the aircraft gets to a waypoint before it's been "hit"
+		TURN_HDG_STEP = pi/2;
 	end
 	methods  
 		function as = AircraftSim(state, geom, controller)
@@ -26,7 +31,46 @@ classdef AircraftSim
 			as.data.F_xyz = [0 0 0];
 		end
 
-		function as = update(as, timeStep)
+		function as = navToPos(as, pos)
+			numSteps = 0;
+			while (numSteps < as.TIMEOUT_NUM_STEPS && as.state.calcDistToPos(pos) > as.WAYPOINT_HIT_RADIUS)
+				pos
+				as.commandHdg = as.state.calcHdgToPos(pos);
+				as.commandAlt = pos(3);
+				as = as.update();
+				numSteps = numSteps + 1;
+			end
+		end
+
+		function as = turnCircle(as, rot)
+		% turn a full circle with rotation direction rot
+		% Inputs:
+		%	rot [+/- 1] rotation direction (+: turn to right, -: turn to left)
+			origHdg = as.state.hdg;
+			lastHdg = origHdg;
+			hdgStep = rot * as.TURN_HDG_STEP;
+			totHdgChange = 0;
+			numSteps = 0;
+			while (numSteps < as.TIMEOUT_NUM_STEPS && abs(totHdgChange) < 2*pi)
+				if (as.state.hdg + hdgStep >= 2*pi)
+					% turning across north clockwise
+					as.commandHdg = as.state.hdg + hdgStep - 2*pi;
+				elseif (as.state.hdg + hdgStep < 0)
+					% turning across north counterclockwise
+					as.commandHdg = as.state.hdg + hdgStep + 2*pi;
+				else
+					% not crossing north
+					as.commandHdg = as.state.hdg + hdgStep;
+				end
+				fprintf('Turning circle, totHdgChange', totHdgChange)
+				totHdgChange = totHdgChange + abs(as.state.calcHdgDiff(lastHdg));
+				lastHdg = as.state.hdg
+				as = as.update();
+				numSteps = numSteps + 1;
+			end
+		end
+
+		function as = update(as)
 			% units
 			units = loadUnits();
 			% transformation matrices
@@ -34,20 +78,9 @@ classdef AircraftSim
 			AC_VERT_2_XYZ = [-sin(as.state.gamma), (cos(as.state.gamma) * sin(as.state.phi)), (cos(as.state.gamma) * cos(as.state.phi))];
 			XYZ_2_NEU = [cos(as.state.hdg), sin(as.state.hdg), 0; -sin(as.state.hdg), cos(as.state.hdg), 0; 0, 0, 1];
 
-			%% Control loops
-			% PD altitude control (controls lift multiplier)
-			altErr = as.state.pos(3) - as.commandAlt;
-			dAltErr = as.state.vel(3);
-			as.geom.liftMult = as.controller.controlAlt(altErr, dAltErr, as.geom.liftMult);
-
-			% PD heading control (controls aircraft roll)
-			hdgErr = as.state.calcHdgDiff(as.commandHdg);
-			dHdgErr = as.state.calcHdgDiff(as.data.state(end).hdg) / timeStep;
-			as.state.phi = as.controller.controlHdg(hdgErr, dHdgErr, as.state.phi);
-
 			%% Fly the aircraft
 			% update current state variables
-			as.time = as.time + timeStep;
+			as.time = as.time + as.TIME_STEP;
 
 			T_xyz = as.geom.calcThrust(as.state.v_inf, 1) .* AC_LONG_2_XYZ; % [T_x T_y T_z]
 			L_xyz = as.geom.calcLift(as.state.q_inf) .* AC_VERT_2_XYZ; % [L_x L_y L_z]
@@ -58,7 +91,18 @@ classdef AircraftSim
 			F_neu = F_xyz * XYZ_2_NEU;
 
 			as.state.acc = F_neu ./ as.geom.mass;
-			as.state = as.state.update(timeStep);
+			as.state = as.state.update(as.TIME_STEP);
+
+			%% Control loops
+			% PD altitude control (controls lift multiplier)
+			altErr = as.state.pos(3) - as.commandAlt;
+			dAltErr = as.state.vel(3);
+			as.geom.liftMult = as.controller.controlAlt(altErr, dAltErr, as.geom.liftMult);
+
+			% PD heading control (controls aircraft roll)
+			hdgErr = as.state.calcHdgDiff(as.commandHdg);
+			dHdgErr = as.state.calcHdgDiff(as.data.state(end).hdg) / as.TIME_STEP
+			as.state.phi = as.controller.controlHdg(hdgErr, dHdgErr, as.state.phi);
 
 			% ground interactions: stop aircraft from sinking into ground
 			if (as.state.pos(3) <= 0 && as.state.vel(3) < 0)

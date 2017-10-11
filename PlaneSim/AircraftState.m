@@ -77,11 +77,13 @@ classdef AircraftState
 			elseif (hdgDiff < -pi)
 				hdgDiff = (2 * pi) + hdgDiff;
 			end
+			fprintf('Hdg Diff %f, as.hdg=%f, hdg=%f', hdgDiff, as.hdg, hdg)
 		end
 		function hdg = calcHdgToPos(as, pos)
 		% calculates the heading to an object pos from the aircraft's current position
 			diff_n = pos(1) - as.pos(1);
 			diff_e = pos(2) - as.pos(2);
+			fprintf('diff_e = %f from %f - %f\n', diff_e, pos(2), as.pos(2))
 
 			if (diff_e == 0)
 				% directly north or south
@@ -91,12 +93,19 @@ classdef AircraftState
 					hdg = pi; % south
 				end
 			elseif (diff_e > 0)
+				fprintf('east-ish')
 				% east-ish, 0-pi
 				hdg = pi/2 - atan(diff_n / diff_e);
 			else
+				fprintf('west-ish')
 				% west-ish, pi-2pi
 				hdg = 3*pi/2 - atan(diff_n / diff_e);
 			end
+			fprintf('calcHdgToPos=%f', hdg)
+		end
+		function dist = calcDistToPos(as, pos)
+			diff_pos = pos - as.pos;
+			dist = sum(diff_pos.^2)
 		end
 	end
 end

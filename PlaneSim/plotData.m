@@ -19,10 +19,10 @@ function plotData(data)
 	rectangle('Position', [-1, 0, 2, RUNWAY_LENGTH]); % runway takeoff area
 	PYLON_DIAM = 5;
 	rectangle('Position', [0, 500/units.M_2_FT, PYLON_DIAM, PYLON_DIAM], 'Curvature', [1, 1]); % pylon 1
-	rectangle('Position', [0, -500/units.M_2_FT, PYLON_DIAM, PYLON_DIAM], 'Curvature', [1, 1]); % pylon 2
+	rectangle('Position', [100/units.M_2_FT, 0, PYLON_DIAM, PYLON_DIAM], 'Curvature', [1, 1]); % pylon 2
+	rectangle('Position', [0, -500/units.M_2_FT, PYLON_DIAM, PYLON_DIAM], 'Curvature', [1, 1]); % pylon 3
 	hold on;
 	plot3(pos_n, pos_e, pos_u);
-	% pbaspect([1 1 1]); % plot box aspect ratio is uniform
 	daspect([1 1 1]); % data aspect ratio is uniform
 	set(gca, 'YDir', 'reverse'); % x axis increases from left to right
 
