@@ -34,7 +34,6 @@ classdef AircraftSim
 		function as = navToPos(as, pos)
 			numSteps = 0;
 			while (numSteps < as.TIMEOUT_NUM_STEPS && as.state.calcDistToPos(pos) > as.WAYPOINT_HIT_RADIUS)
-				pos
 				as.commandHdg = as.state.calcHdgToPos(pos);
 				as.commandAlt = pos(3);
 				as = as.update();
@@ -62,9 +61,8 @@ classdef AircraftSim
 					% not crossing north
 					as.commandHdg = as.state.hdg + hdgStep;
 				end
-				fprintf('Turning circle, totHdgChange', totHdgChange)
 				totHdgChange = totHdgChange + abs(as.state.calcHdgDiff(lastHdg));
-				lastHdg = as.state.hdg
+				lastHdg = as.state.hdg;
 				as = as.update();
 				numSteps = numSteps + 1;
 			end
@@ -101,7 +99,7 @@ classdef AircraftSim
 
 			% PD heading control (controls aircraft roll)
 			hdgErr = as.state.calcHdgDiff(as.commandHdg);
-			dHdgErr = as.state.calcHdgDiff(as.data.state(end).hdg) / as.TIME_STEP
+			dHdgErr = as.state.calcHdgDiff(as.data.state(end).hdg) / as.TIME_STEP;
 			as.state.phi = as.controller.controlHdg(hdgErr, dHdgErr, as.state.phi);
 
 			% ground interactions: stop aircraft from sinking into ground
