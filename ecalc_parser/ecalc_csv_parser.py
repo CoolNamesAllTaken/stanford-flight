@@ -14,7 +14,7 @@ print("Opening file [" + fname + "]")
 with open(sys.argv[1]) as f:
     lines = f.readlines()
 
-
+project_name    = 'project name missing'
 motor_v_inf     = [0]*3
 motor_T         = [0]*3
 motor_e_prop    = [0]*3
@@ -30,6 +30,9 @@ for line in lines:
     splitLine = line.split(';')
     firstWord = splitLine[0]
     
+
+    if(firstWord == 'Project Name'):
+        project_name = splitLine[2]
     if(firstWord == 'avail.Thrust @ Flight Speed:'):
         motor_T[CRUISE] = float(splitLine[2].split()[0]) / 1000 #from g-->kg
         motor_v_inf[CRUISE] = float(splitLine[2].split()[2]) * (1000.0/3600) #km/hr --> m/s
@@ -45,7 +48,7 @@ for line in lines:
         e_power = float(splitLine[2])
 motor_e_prop[STALL] = motor_T[STALL] / e_power
 
-
+print("\nProject name = [" + project_name + "]")
 print("\tmotor_v_inf   :  " + str(motor_v_inf))
 print("\tmotor_T       :  " + str(motor_T))
 print("\tmotor_e_prop  :  " + str(motor_e_prop))
