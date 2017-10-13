@@ -12,7 +12,7 @@ RHO = 1.1; % [kg/m^3], kansas-ish
 PYLON_DIST = 500 / units.M_2_FT; % [m] pylon distance from start line
 COURSE_WIDTH = 100 / units.M_2_FT; % [m] 360 turn distance from start
 
-NUM_LAPS = 1;
+NUM_LAPS = 3;
 
 % control loop gains
 P_alt = 0.1;

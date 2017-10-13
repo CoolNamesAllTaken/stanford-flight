@@ -23,7 +23,7 @@ function geom = defineAircraftGeometry(aircraftName)
 		fuse = DragSurface(fuse_A, fuse_C_D);
 		dragSurfaces = {fuse};
 
-		motor_v_inf = [0 13.06 26.11]; % [m/s] static, cruise
+		motor_v_inf = [0 21.03 26.11]; % [m/s] static, cruise
 		motor_T = [1.204 0.239 0]; % [N] static, cruise
 		motor_e_prop = [0.0048 0.00307 0]; % [kg/W] static, cruise
 		motor_e_motor = 0.795; % static and cruise
