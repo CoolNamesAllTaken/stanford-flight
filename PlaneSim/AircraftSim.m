@@ -26,8 +26,12 @@ classdef AircraftSim
 			as.data.time = 0;
 			as.data.state = state;
 			as.data.v_inf = state.v_inf;
-			as.data.thrust = 0;
+			as.data.capacity = 0;
+            as.data.battPower = 0;
+
+			as.data.T = 0;
 			as.data.L = 0;
+			as.data.D = 0;
 			as.data.F_xyz = [0 0 0];
 		end
 
@@ -80,7 +84,12 @@ classdef AircraftSim
 			% update current state variables
 			as.time = as.time + as.TIME_STEP;
 
-			T_xyz = as.geom.calcThrust(as.state.v_inf, 1) .* AC_LONG_2_XYZ; % [T_x T_y T_z]
+			propulsion = as.geom.calcPropulsion(as.state.v_inf, 1); % [T, battPower]
+			battPower = propulsion(2);
+			battVoltage = propulsion(3);
+			capacity = as.data.capacity(end) + (battPower / battVoltage) * as.TIME_STEP * units.AS_2_MAH;
+
+			T_xyz = propulsion(1) .* AC_LONG_2_XYZ; % [T_x T_y T_z]
 			L_xyz = as.geom.calcLift(as.state.q_inf) .* AC_VERT_2_XYZ; % [L_x L_y L_z]
 			D_xyz = -as.geom.calcDrag(as.state.q_inf) .* AC_LONG_2_XYZ; % [D_x D_y D_z]
 			W_xyz = [0, 0, -(as.geom.mass * units.KG_2_N)]; % [W_x W_y W_z]
@@ -113,8 +122,11 @@ classdef AircraftSim
 			as.data.time = vertcat(as.data.time, as.time);
 			as.data.state = vertcat(as.data.state, as.state);
 			as.data.v_inf = vertcat(as.data.v_inf, as.state.v_inf);
-			as.data.thrust = vertcat(as.data.thrust, sqrt(sum(T_xyz.^2)));
+			as.data.battPower = vertcat(as.data.battPower, battPower);
+			as.data.capacity = vertcat(as.data.capacity, capacity);
+			as.data.T = vertcat(as.data.T, sqrt(sum(T_xyz.^2)));
 			as.data.L = vertcat(as.data.L, sqrt(sum(L_xyz.^2)));
+			as.data.D = vertcat(as.data.D, sqrt(sum(D_xyz.^2)));
 			as.data.F_xyz = vertcat(as.data.F_xyz, F_xyz);
 		end
 	end

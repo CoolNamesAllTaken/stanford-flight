@@ -46,12 +46,14 @@ classdef AircraftGeom
 				T = T + (ag.motors{i}.calcThrust(v_inf, throttle) .* units.KG_2_N);
 			end
 		end
-		function ret = calcPropulsion(ag, v_inf)
+		function ret = calcPropulsion(ag, v_inf, throttle)
 			units = loadUnits();
-			ret = [0 0] % [T battPower], measured in [N] and [W]
+			ret = [0 0]; % [T, battPower], measured in [N] and [W]
 			for i = 1:length(ag.motors)
 				ret = ret + (ag.motors{i}.calcPropulsion(v_inf, throttle) .* [units.KG_2_N 1]);
 			end
+			ret(end + 1) = ag.motors{1}.battVoltage; % [T, battPower, battVoltage]
+			ret
 		end
 		function phi_max = calcphi_max(ag, q_inf)
 			% returns the maximum bank angle [rad] that could result in level flight at q_inf (assuming C_Lmax)

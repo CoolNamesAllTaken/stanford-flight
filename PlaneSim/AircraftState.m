@@ -6,8 +6,6 @@ classdef AircraftState
 
 		phi = 0; % [rad] roll angle
 
-		% TODO: add batt capacity
-
 		rho = 1.1; % [kg/m^3] air density, default value is kansas-ish
 	end
 	properties (Dependent)

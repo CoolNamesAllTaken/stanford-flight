@@ -27,7 +27,8 @@ function geom = defineAircraftGeometry(aircraftName)
 		motor_T = [1.204 0.239 0]; % [N] static, cruise
 		motor_e_prop = [0.0048 0.00307 0]; % [kg/W] static, cruise
 		motor_e_motor = 0.795; % static and cruise
-		motor = Motor(motor_v_inf, motor_T, motor_e_prop, motor_e_motor);
+		batt_voltage = 14; % [V] loaded voltage
+		motor = Motor(motor_v_inf, motor_T, motor_e_prop, motor_e_motor, batt_voltage);
 
 		geom = AircraftGeom('Little Pucker', mass, liftSurfaces, dragSurfaces, {motor});
 	end

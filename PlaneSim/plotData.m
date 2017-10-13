@@ -1,7 +1,6 @@
 function plotData(data)
 	units = loadUnits();
 
-	close all;
 	set(0,'DefaultFigureWindowStyle','docked');
 
 	pos_n = [];
@@ -56,7 +55,7 @@ function plotData(data)
 	ylabel('v_{inf} [m/s]');
 
 	a = vertcat(a, subplot(5, 1, 4));
-	plot(data.time, data.thrust);
+	plot(data.time, data.T);
 	grid on;
 	ylabel('Thrust [N]');
 
