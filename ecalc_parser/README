@@ -1,0 +1,2 @@
+Naming convention of each CSV is:
+{weight of model pre-electronics}g__{weight of model with electronics}g.csv
