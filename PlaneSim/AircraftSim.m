@@ -12,7 +12,7 @@ classdef AircraftSim
 
 		data % contains states, etc of past simulation times
 
-		TIMEOUT_NUM_STEPS = 500; % max number of time steps before timeout
+		TIMEOUT_NUM_STEPS = 200; % max number of time steps before timeout
 		WAYPOINT_HIT_RADIUS = 10; % [m] how close the aircraft gets to a waypoint before it's been "hit"
 		TURN_HDG_STEP = pi/2;
 	end
@@ -34,6 +34,9 @@ classdef AircraftSim
 			as.data.L = 0;
 			as.data.D = 0;
 			as.data.F_xyz = [0 0 0];
+
+			as.data.commandAlt = 0;
+			as.data.commandHdg = 0;
 		end
 
 		function as = navToPos(as, pos)
@@ -81,7 +84,6 @@ classdef AircraftSim
 			AC_VERT_2_XYZ = [-sin(as.state.gamma), (cos(as.state.gamma) * sin(as.state.phi)), (cos(as.state.gamma) * cos(as.state.phi))];
 			XYZ_2_NEU = [cos(as.state.hdg), sin(as.state.hdg), 0; -sin(as.state.hdg), cos(as.state.hdg), 0; 0, 0, 1];
 
-			fprintf('time = %.2fsec\n', as.time);
 			%% Fly the aircraft
 			% update current state variables
 			as.time = as.time + as.timeStep;
@@ -130,6 +132,8 @@ classdef AircraftSim
 			as.data.L = vertcat(as.data.L, sqrt(sum(L_xyz.^2)));
 			as.data.D = vertcat(as.data.D, sqrt(sum(D_xyz.^2)));
 			as.data.F_xyz = vertcat(as.data.F_xyz, F_xyz);
+			as.data.commandAlt = vertcat(as.data.commandAlt, as.commandAlt);
+			as.data.commandHdg = vertcat(as.data.commandHdg, as.commandHdg);
 		end
 	end
 end

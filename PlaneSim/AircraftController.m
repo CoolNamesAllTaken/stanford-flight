@@ -8,6 +8,7 @@ classdef AircraftController
 
 		LIFTMULT_MAX = 1; % maximum lift multiplier (1: 100% of C_Lmax)
 		LIFTMULT_MIN = 0; % minimum lift multiplier (0: C_L = 0)
+
 		PHI_MAX = pi/4; % [rad] maximum +/- bank angle
 	end
 	methods  
@@ -21,16 +22,14 @@ classdef AircraftController
 
 		function liftMult = controlAlt(ac, altErr, dAltErr, liftMult)
 			% PD altitude control
-			response = altErr * ac.P_alt + dAltErr * ac.D_alt;
-
-			liftMult = liftMult - response;
+			liftMult = -(altErr * ac.P_alt + dAltErr * ac.D_alt) * ac.timeStep;
 			if (liftMult > ac.LIFTMULT_MAX) liftMult = ac.LIFTMULT_MAX;
 			elseif (liftMult < ac.LIFTMULT_MIN) liftMult = ac.LIFTMULT_MIN; end
 		end
 
 		function phi = controlHdg(ac, hdgErr, dHdgErr, phi)
 			% PD heading control
-			response = hdgErr * ac.P_hdg + dHdgErr * ac.D_hdg;
+			response = (hdgErr * ac.P_hdg + dHdgErr * ac.D_hdg) * ac.timeStep;
 
 			phi = phi + response;
 			if (phi > ac.PHI_MAX) phi = ac.PHI_MAX;
