@@ -98,7 +98,7 @@ classdef AircraftState
 			end
 		end
 		function dist = calcDistToPos(as, pos)
-			diff_pos = pos - as.pos;
+			diff_pos = (pos - as.pos) .* [1 1 0]; % ignore altitude
 			dist = sum(diff_pos.^2);
 		end
 	end

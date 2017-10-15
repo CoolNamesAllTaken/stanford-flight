@@ -66,7 +66,7 @@ function geom = defineAircraftGeometry(aircraftName)
 		dashIndices = strfind(aircraftName, '-');
 		numPax = str2num(aircraftName(dashIndices(1)+1:dashIndices(2)-1));
 		loadedStr = aircraftName(dashIndices(2)+1:end);
-		loaded = strcmpi(loadedStr, 'full');
+		loaded = strcmpi(loadedStr, 'full')
 
 		% estimate fuselage structural weight
 		passengerConfiguration = [32 32 49 49]; %passengers in the row
@@ -74,15 +74,12 @@ function geom = defineAircraftGeometry(aircraftName)
 		inchToMiliConversion = 25.4;
 		areaDensityFoam = 110/(20*29.5*(inchToMiliConversion^2)); % g/mm^2  20x29.5in 110g 
 		areaDensity = areaDensityFoam*1.5; %reinforced
-		[emptyFuselageWeight, passengerLoadedWeight, fuselageLength, fuselageWidth, fuselageHeight] = ...
+		[emptyFuselageMass, passengerLoadedMass, fuselageLength, fuselageWidth, fuselageHeight] = ...
 		ballParkEstimate(numPax, passengerConfiguration, numBatts, areaDensity);
-
-		% structural mass
-		dryMass = (passengerLoadedWeight * loaded + emptyFuselageWeight * (1 - loaded)) * units.G_2_KG % [kg]
-
+    
 		% propulsion system estimate
-		propEst = propulsionEstimate(dryMass)
-		mass = propEst.propulsionMass + dryMass
+		propEst = propulsionEstimate(passengerLoadedMass * units.G_2_KG)
+		maxMass = propEst.propulsionMass + passengerLoadedMass * units.G_2_KG
 		motor = Motor(propEst.motor_v_inf, propEst.motor_T, propEst.motor_e_prop, propEst.motor_e_motor, propEst.batt_voltage);
 
 		% cruise conditions
@@ -90,7 +87,7 @@ function geom = defineAircraftGeometry(aircraftName)
 		rho = 1.1; % [kg/m^2] kansas-ish
 		q_inf = 0.5 .* rho .* v_inf^2;
 
-		[wing_b, wing_S] = aeroEstimate(mass, v_inf)
+		[wing_b, wing_S] = aeroEstimate(maxMass, v_inf)
 		wing_C_Lmax = 1.8; % max C_L
 		wing_C_D0 = 0.02; % zero lift C_D TODO: get from XFLR5?
 		wing_e = 0.9; % oswald efficiency factor TODO: get from XFLR5?
@@ -98,14 +95,16 @@ function geom = defineAircraftGeometry(aircraftName)
 		liftSurfaces = {wing};
 
 		fuse_C_D = 2.1; % rectangular box
-		fuse_A = fuselageHeight * units.MM_2_M * fuselageWidth * units.MM_2_M; %[m^2] frontal area
+		fuse_A = fuselageHeight * units.MM_2_M * fuselageWidth * units.MM_2_M %[m^2] frontal area
 		fuse = DragSurface(fuse_A, fuse_C_D);
 		dragSurfaces = {fuse};
 
-		if (~loaded)
-			mass = (emptyFuselageWeight * units.G_2_KG) + propEst.propulsionMass;
-		end
-
+		if (loaded)
+            mass = maxMass
+        else
+			mass = (emptyFuselageMass * units.G_2_KG) + propEst.propulsionMass;
+        end
+        fprintf('Max Mass: %.2f Current Mass: %.2f', maxMass, mass);
 		geom = AircraftGeom(['DBF18 ' num2str(numPax) ' ' loadedStr], mass, liftSurfaces, dragSurfaces, {motor})
 	end
 end

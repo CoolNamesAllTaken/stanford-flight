@@ -17,7 +17,7 @@ classdef AircraftController
 			ac.D_alt = D_alt;
 			ac.P_hdg = P_hdg;
 			ac.D_hdg = D_hdg;
-			ac.timeStep = timeStep
+			ac.timeStep = timeStep;
 		end
 
 		function liftMult = controlAlt(ac, altErr, dAltErr, liftMult)

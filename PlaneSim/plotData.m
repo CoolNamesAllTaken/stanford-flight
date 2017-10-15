@@ -139,6 +139,9 @@ function plotData(data)
 	a = vertcat(a, subplot(4, 1, 2));
 	plot(data.time, [data.state(:).phi]);
 	grid on;
+	hold on;
+	plot(data.time, ones(size(data.time)) .* data.phiMax, '--r');
+    plot(data.time, ones(size(data.time)) .* -data.phiMax, '--r');
 	ylabel('phi [rad]');
 
 	a = vertcat(a, subplot(4, 1, 3));

@@ -37,6 +37,8 @@ classdef AircraftSim
 
 			as.data.commandAlt = 0;
 			as.data.commandHdg = 0;
+
+			as.data.phiMax = as.controller.PHI_MAX;
 		end
 
 		function as = navToPos(as, pos)

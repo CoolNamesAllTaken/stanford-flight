@@ -14,7 +14,7 @@ classdef AircraftGeom
 			ag.mass = mass;
 			ag.liftSurfaces = liftSurfaces;
 			ag.dragSurfaces = dragSurfaces;
-			ag.motors = motors
+			ag.motors = motors;
 		end
 
 		function ag = set.liftMult(ag, liftMult)
