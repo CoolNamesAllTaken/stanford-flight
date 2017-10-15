@@ -80,6 +80,7 @@ classdef AircraftSim
 			AC_VERT_2_XYZ = [-sin(as.state.gamma), (cos(as.state.gamma) * sin(as.state.phi)), (cos(as.state.gamma) * cos(as.state.phi))];
 			XYZ_2_NEU = [cos(as.state.hdg), sin(as.state.hdg), 0; -sin(as.state.hdg), cos(as.state.hdg), 0; 0, 0, 1];
 
+			fprintf('time = %.2fsec\n', as.time);
 			%% Fly the aircraft
 			% update current state variables
 			as.time = as.time + as.TIME_STEP;
