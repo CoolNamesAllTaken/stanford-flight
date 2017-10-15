@@ -11,6 +11,7 @@ function courseResults = flyCourse(geom, numLaps, simParams, verbose)
 	%	simparams.D_alt = derivative altitude control gain
 	%	simParams.P_hdg = proportional heading control gain
 	%	simParams.D_hdg = derivative heading control gain
+	%	simParams.timeStep = dt for linear sim
 	%	verbose = true: output plots and dialogue false: run silently
 	% Returns
 	%	courseResults = [totalTime[s], minLapTime[s], maxLapTime[s], capacity[mAh]]
@@ -23,10 +24,10 @@ function courseResults = flyCourse(geom, numLaps, simParams, verbose)
 		state.rho = simParams.RHO;
 		state.vel = [0 0.1 0]; % start aircraft rolling down runway (heading established)
 
-		controller = AircraftController(simParams.P_alt, simParams.D_alt, simParams.P_hdg, simParams.D_hdg);
+		controller = AircraftController(simParams.P_alt, simParams.D_alt, simParams.P_hdg, simParams.D_hdg, simParams.timeStep);
 		controller.PHI_MAX = geom.calcphi_max(0.5 * simParams.RHO * simParams.CRUISE_V_INF^2);
 
-		sim = AircraftSim(state, geom, controller);
+		sim = AircraftSim(state, geom, controller, simParams.timeStep);
 		sim.commandAlt = simParams.CRUISE_ALT;
 		sim.commandHdg = pi/2;
 

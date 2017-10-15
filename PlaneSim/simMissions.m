@@ -10,6 +10,7 @@ simParams.P_alt = 0.1;
 simParams.D_alt = 0.3;
 simParams.P_hdg = 0.5;
 simParams.D_hdg = 0.5;
+simParams.timeStep = 0.1; % [s]
 
 close all; % clear all plots
 
