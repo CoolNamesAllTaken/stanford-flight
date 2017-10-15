@@ -38,10 +38,14 @@ function courseResults = flyCourse(geom, numLaps, simParams, verbose)
 		for (i=1:numLaps)
 			startTime = sim.time;
 			sim = sim.navToPos([0, PYLON_DIST, simParams.CRUISE_ALT]);
+			fprintf('p1 ')
 			sim = sim.navToPos([COURSE_WIDTH, 0, simParams.CRUISE_ALT]);
+			fprintf('p2 ')
 			sim = sim.turnCircle(1);
 			sim = sim.navToPos([COURSE_WIDTH, -PYLON_DIST, simParams.CRUISE_ALT]);
+			fprintf('p3 ')
 			sim = sim.navToPos([0, 0, simParams.CRUISE_ALT]);
+			fprintf('lap %d\n', i)
 			endTime = sim.time;
 			lapTime = endTime - startTime;
 			if (lapTime > maxLapTime)

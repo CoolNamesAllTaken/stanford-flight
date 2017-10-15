@@ -12,39 +12,55 @@ simParams.P_hdg = 1.8;
 simParams.D_hdg = 1.5;
 simParams.timeStep = 0.1; % [s]
 
+% competitor best guesses
+MAX_PASSENGERS_TIME = 80 / 180; % [80 pax / 3 mins] best M2 combo of any team
+
 close all; % clear all plots
 
 % % BEGIN
-% PYLON_DIST = 500 / units.M_2_FT; % [m] pylon distance from start line
-% COURSE_WIDTH = 100 / units.M_2_FT; % [m] 360 turn distance from start
+PYLON_DIST = 500 / units.M_2_FT; % [m] pylon distance from start line
+COURSE_WIDTH = 100 / units.M_2_FT; % [m] 360 turn distance from start
 
-% state = AircraftState();
-% state.rho = simParams.RHO;
-% state.vel = [0 0.1 0]; % start aircraft rolling down runway (heading established)
+state = AircraftState();
+state.rho = simParams.RHO;
+state.vel = [0 0.1 0]; % start aircraft rolling down runway (heading established)
 
-% geom = defineAircraftGeometry('DBF18-50-full')
+geom = defineAircraftGeometry('DBF18-40-empty')
 
-% controller = AircraftController(simParams.P_alt, simParams.D_alt, simParams.P_hdg, simParams.D_hdg, simParams.timeStep);
-% controller.PHI_MAX = geom.calcphi_max(0.5 * simParams.RHO * simParams.CRUISE_V_INF^2);
+controller = AircraftController(simParams.P_alt, simParams.D_alt, simParams.P_hdg, simParams.D_hdg, simParams.timeStep);
+controller.PHI_MAX = geom.calcphi_max(0.5 * simParams.RHO * simParams.CRUISE_V_INF^2);
 
-% sim = AircraftSim(state, geom, controller, simParams.timeStep);
-% sim.commandAlt = simParams.CRUISE_ALT;
-% sim.commandHdg = pi/2;
+sim = AircraftSim(state, geom, controller, simParams.timeStep);
+sim.commandAlt = simParams.CRUISE_ALT;
+sim.commandHdg = pi/2;
 
-% sim = sim.navToPos([PYLON_DIST, PYLON_DIST, simParams.CRUISE_ALT]);
-% plotData(sim.data);
+sim = sim.navToPos([PYLON_DIST, PYLON_DIST, simParams.CRUISE_ALT]);
+plotData(sim.data);
 % % END
 
-% fly M1
-fprintf('===== MISSION 1 =====')
-geom = defineAircraftGeometry('DBF18-50-empty');
-missionResults(1) = flyCourse(geom, 3, simParams, true)
-missionScores(1) = 1.0
-fprintf('Mission 1 Complete\nScore: %.2f\n', missionScores(1))
+paxList = [20, 48, 80]; % list of passenger configurations to try
 
-% fly M2
-% m2Results = flyCourse(3)
+for i = 1:length(paxList)
+	pax = paxList(i);
 
-% fly M3
+	% fly M1
+	fprintf('===== MISSION 1 =====')
+	geom = defineAircraftGeometry(['DBF18-' num2str(pax) '-empty']);
+	mission1Results(i) = flyCourse(geom, 3, simParams, true)
+	mission1Scores(i) = 1.0;
+	fprintf('Mission 1 Complete\nScore: %.2f\n', mission1Scores(i))
+
+	% fly M2
+	fprintf('===== MISSION 2 =====')
+	geom = defineAircraftGeometry(['DBF18-' num2str(pax) '-full']);
+	mission2Results(i) = flyCourse(geom, 3, simParams, true)
+	mission2Scores(i) = 2 * pax / mission2Results(i).time / MAX_PASSENGERS_TIME; % NOT COUNTING COMPETITORS
+	fprintf('Mission 2 Complete\nScore: %.2f\n', mission1Scores(i))
+
+	% fly M3
+end
+
+figure();
+plot(paxList, mission2Results);
 
 end

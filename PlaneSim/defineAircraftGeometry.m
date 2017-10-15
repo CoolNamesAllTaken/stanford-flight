@@ -23,8 +23,8 @@ function geom = defineAircraftGeometry(aircraftName)
 		fuse = DragSurface(fuse_A, fuse_C_D);
 		dragSurfaces = {fuse};
 
-		motor_v_inf = [0 21.03 26.11]; % [m/s] static, cruise
-		motor_T = [1.204 0.239 0]; % [N] static, cruise
+		motor_v_inf = [0.0 21.03 26.11]; % [m/s] static, cruise
+		motor_T = [1.204 0.239 0]; % [kg] static, cruise
 		motor_e_prop = [0.0048 0.00307 0]; % [kg/W] static, cruise
 		motor_e_motor = 0.795; % static and cruise
 		batt_voltage = 14; % [V] loaded voltage
@@ -53,8 +53,8 @@ function geom = defineAircraftGeometry(aircraftName)
 		fuse = DragSurface(fuse_A, fuse_C_D);
 		dragSurfaces = {fuse};
 
-		motor_v_inf = [0 21.03 26.11]; % [m/s] static, cruise
-		motor_T = [1.204 0.239 0]; % [N] static, cruise
+		motor_v_inf = [0.0 21.03 26.11]; % [m/s] static, cruise
+		motor_T = [1.204 0.239 0]; % [kg] static, cruise
 		motor_e_prop = [0.0048 0.00307 0]; % [kg/W] static, cruise
 		motor_e_motor = 0.795; % static and cruise
 		batt_voltage = 14; % [V] loaded voltage
@@ -77,15 +77,20 @@ function geom = defineAircraftGeometry(aircraftName)
 		[emptyFuselageWeight, passengerLoadedWeight, fuselageLength, fuselageWidth, fuselageHeight] = ...
 		ballParkEstimate(numPax, passengerConfiguration, numBatts, areaDensity);
 
-		mass = (passengerLoadedWeight * loaded + emptyFuselageWeight * (1 - loaded)) * units.G_2_KG % [kg]
+		% structural mass
+		dryMass = (passengerLoadedWeight * loaded + emptyFuselageWeight * (1 - loaded)) * units.G_2_KG % [kg]
+
+		% propulsion system estimate
+		propEst = propulsionEstimate(dryMass)
+		mass = propEst.propulsionMass + dryMass
+		motor = Motor(propEst.motor_v_inf, propEst.motor_T, propEst.motor_e_prop, propEst.motor_e_motor, propEst.batt_voltage);
 
 		% cruise conditions
 		v_inf = 25; % [m/s]
 		rho = 1.1; % [kg/m^2] kansas-ish
 		q_inf = 0.5 .* rho .* v_inf^2;
 
-		wing_b = 1.4;
-		wing_S = 0.18;
+		[wing_b, wing_S] = aeroEstimate(mass, v_inf)
 		wing_C_Lmax = 1.8; % max C_L
 		wing_C_D0 = 0.02; % zero lift C_D TODO: get from XFLR5?
 		wing_e = 0.9; % oswald efficiency factor TODO: get from XFLR5?
@@ -97,13 +102,10 @@ function geom = defineAircraftGeometry(aircraftName)
 		fuse = DragSurface(fuse_A, fuse_C_D);
 		dragSurfaces = {fuse};
 
-		motor_v_inf = [0 21.03 26.11]; % [m/s] static, cruise
-		motor_T = [1.204 0.239 0]; % [N] static, cruise
-		motor_e_prop = [0.0048 0.00307 0]; % [kg/W] static, cruise
-		motor_e_motor = 0.795; % static and cruise
-		batt_voltage = 14; % [V] loaded voltage
-		motor = Motor(motor_v_inf, motor_T, motor_e_prop, motor_e_motor, batt_voltage);
+		if (~loaded)
+			mass = (emptyFuselageWeight * units.G_2_KG) + propEst.propulsionMass;
+		end
 
-		geom = AircraftGeom(['DBF18 ' num2str(numPax) ' ' loadedStr], mass, liftSurfaces, dragSurfaces, {motor});
+		geom = AircraftGeom(['DBF18 ' num2str(numPax) ' ' loadedStr], mass, liftSurfaces, dragSurfaces, {motor})
 	end
 end

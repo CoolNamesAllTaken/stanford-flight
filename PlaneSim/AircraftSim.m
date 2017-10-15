@@ -12,8 +12,8 @@ classdef AircraftSim
 
 		data % contains states, etc of past simulation times
 
-		TIMEOUT_NUM_STEPS = 200; % max number of time steps before timeout
-		WAYPOINT_HIT_RADIUS = 10; % [m] how close the aircraft gets to a waypoint before it's been "hit"
+		TIMEOUT_NUM_STEPS = 500; % max number of time steps before timeout
+		WAYPOINT_HIT_RADIUS = 20; % [m] how close the aircraft gets to a waypoint before it's been "hit"
 		TURN_HDG_STEP = pi/2;
 	end
 	methods  
@@ -80,8 +80,8 @@ classdef AircraftSim
 			% units
 			units = loadUnits();
 			% transformation matrices
-			AC_LONG_2_XYZ = [cos(as.state.gamma), (sin(as.state.gamma) * sin(as.state.phi)), (sin(as.state.gamma) * cos(as.state.phi))];
-			AC_VERT_2_XYZ = [-sin(as.state.gamma), (cos(as.state.gamma) * sin(as.state.phi)), (cos(as.state.gamma) * cos(as.state.phi))];
+			AC_LONG_2_XYZ = real([cos(as.state.gamma), (sin(as.state.gamma) * sin(as.state.phi)), (sin(as.state.gamma) * cos(as.state.phi))]);
+			AC_VERT_2_XYZ = real([-sin(as.state.gamma), (cos(as.state.gamma) * sin(as.state.phi)), (cos(as.state.gamma) * cos(as.state.phi))]);
 			XYZ_2_NEU = [cos(as.state.hdg), sin(as.state.hdg), 0; -sin(as.state.hdg), cos(as.state.hdg), 0; 0, 0, 1];
 
 			%% Fly the aircraft
