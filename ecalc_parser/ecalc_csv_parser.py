@@ -34,7 +34,11 @@ for line in lines:
     if(firstWord == 'Project Name'):
         project_name = splitLine[2]
     if(firstWord == 'avail.Thrust @ Flight Speed:'):
-        motor_T[CRUISE] = float(splitLine[2].split()[0]) / 1000 #from g-->kg
+        temp = splitLine[2].split()[0]
+        if(temp == "-"):
+            motor_T[CRUISE] = 0
+        else:
+            motor_T[CRUISE] = float(temp) / 1000 #from g-->kg
         motor_v_inf[CRUISE] = float(splitLine[2].split()[2]) * (1000.0/3600) #km/hr --> m/s
     if(firstWord == 'Pitch Speed:'):
         motor_v_inf[PITCH] = float(splitLine[2]) * (1000.0/3600) #km/hr-->m/s

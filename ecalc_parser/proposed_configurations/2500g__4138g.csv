@@ -1,0 +1,98 @@
+﻿eCalc  -  Propeller Calculator                    all data without guarantee - Accuracy:  /-15%
+
+
+Project Name;;2500_4138;
+
+Battery;;custom;
+Configuration:;;9S7P;
+Load:;C;6.03;
+Voltage:;V;7.70;
+Rated Voltage:;V;9.00;
+Energy:;Wh;126;
+Total Capacity:;mAh;14000;
+max. discharge:;;85%;
+Used Capacity:;mAh;11900;
+min. Flight Time:;min;8.5;
+Mixed Flight Time:;min;11.2;
+Weight:;g;1638;
+;oz;57.8;
+
+
+Controller;;max 60A;
+Current:;A cont.;60;
+;A max;60;
+Weight:;g;80;
+;oz;2.8;
+Wire extension battery:;;AWG10=5.27mm²;
+Length:;mm;0;
+;inch;0;
+Wire extension motor:;;AWG14=2.08mm²;
+Length:;mm;152.4;
+;inch;6;
+
+
+Motor @ Maximum;;Hacker A30-12M-V3 (1370);
+Gear Ratio:;: 1;1;
+Weight:;g;104;
+;oz;3.7;
+Current:;A;42.21;
+Voltage:;V;7.40;
+Revolutions*:;rpm;8390;
+electric Power:;W;312.3;
+mech. Power:;W;255.0;
+Efficiency:;%;81.7;
+est. Temperature:;°C;60;
+;°F;140;
+
+
+Propeller
+Propeller;;Graupner CAM Slim Prop (0°)  11" x 7";
+# Blades:;;2;
+Static Thrust:;g;1694;
+;oz;59.8;
+Revolutions*:;rpm;8390;
+Stall Thrust:;g;1041;
+;oz;36.7;
+avail.Thrust @ Flight Speed:;g@km/h;- @ 90;
+;oz@mph;- @ 55.9;
+Pitch Speed:;km/h;90;
+;mph;56;
+specific Thrust:;g/W;5.42;
+;oz/W;0.19;
+
+
+Total Drive;;
+Drive Weight:;g;2207;
+;oz;77.8;
+Power-Weight:;W/kg;161;
+;W/lb;73;
+Thrust-Weight:;: 1;0.72;
+Current @ max:;A;84.43;
+P(in) @ max:;W;759.8;
+P(out) @ max:;W;510.1;
+Efficiency @ max:;%;67.1;
+
+
+Airplane
+# of Motors:;;2;
+All-up Weight:;g;4707;
+;oz;166;
+Wing Area:;;82;
+Wing Load:;g/dm²;57;
+;oz/ft²;18.7;
+Cubic Wing Load:;;6.3;
+est. Stall Speed:;km/h;37;
+;mph;23;
+est. Speed (level):;km/h;80;
+;mph;50;
+est. Speed (vertical):;km/h;-;
+;mph;-;
+est. rate of climb:;m/s;5.7;
+;ft/min;1126;
+
+
+Remarks:;;0;
+
+Statement for using this calculator: All values are calculated and may deviate from the real. Before flight you have to recheck the actual max. values. All max. values must stay within the limits of the manufacturers. A commercial use is forbidden. We reject any liability! 
+
+(c) by Solution for All   -   7.10, 09.10.17
