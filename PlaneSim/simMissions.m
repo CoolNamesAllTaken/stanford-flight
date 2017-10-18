@@ -38,7 +38,7 @@ close all; % clear all plots
 % plotData(sim.data);
 % % END
 
-paxList = [48, 64, 80, 100]; % list of passenger configurations to try
+paxList = [64, 100, 160]; % list of passenger configurations to try
 
 for i = 1:length(paxList)
 	pax = paxList(i);

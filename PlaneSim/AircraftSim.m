@@ -13,7 +13,7 @@ classdef AircraftSim
 		data % contains states, etc of past simulation times
 
 		TIMEOUT_NUM_STEPS = 500; % max number of time steps before timeout
-		WAYPOINT_HIT_RADIUS = 20; % [m] how close the aircraft gets to a waypoint before it's been "hit"
+		WAYPOINT_HIT_RADIUS = 5; % [m] how close the aircraft gets to a waypoint before it's been "hit"
 		TURN_HDG_STEP = pi/2;
 	end
 	methods  

@@ -27,8 +27,8 @@ function geom = defineAircraftGeometry(aircraftName)
 		motor_T = [1.204 0.239 0]; % [kg] static, cruise
 		motor_e_prop = [0.0048 0.00307 0]; % [kg/W] static, cruise
 		motor_e_motor = 0.795; % static and cruise
-		batt_voltage = 14; % [V] loaded voltage
-		motor = Motor(motor_v_inf, motor_T, motor_e_prop, motor_e_motor, batt_voltage);
+		battVoltage = 14; % [V] loaded voltage
+		motor = Motor(motor_v_inf, motor_T, motor_e_prop, motor_e_motor, battVoltage);
 
 		geom = AircraftGeom('Little Pucker', mass, liftSurfaces, dragSurfaces, {motor});
 	elseif(strcmpi(aircraftName, 'LittlePucker-Empty'))
@@ -57,8 +57,8 @@ function geom = defineAircraftGeometry(aircraftName)
 		motor_T = [1.204 0.239 0]; % [kg] static, cruise
 		motor_e_prop = [0.0048 0.00307 0]; % [kg/W] static, cruise
 		motor_e_motor = 0.795; % static and cruise
-		batt_voltage = 14; % [V] loaded voltage
-		motor = Motor(motor_v_inf, motor_T, motor_e_prop, motor_e_motor, batt_voltage);
+		battVoltage = 14; % [V] loaded voltage
+		motor = Motor(motor_v_inf, motor_T, motor_e_prop, motor_e_motor, battVoltage);
 
 		geom = AircraftGeom('Little Pucker Empty', mass, liftSurfaces, dragSurfaces, {motor});
 	elseif(~isempty(strfind(aircraftName, 'DBF18')))
@@ -66,7 +66,7 @@ function geom = defineAircraftGeometry(aircraftName)
 		dashIndices = strfind(aircraftName, '-');
 		numPax = str2num(aircraftName(dashIndices(1)+1:dashIndices(2)-1));
 		loadedStr = aircraftName(dashIndices(2)+1:end);
-		loaded = strcmpi(loadedStr, 'full')
+		loaded = strcmpi(loadedStr, 'full');
 
 		% estimate fuselage structural weight
 		passengerConfiguration = [32 32 49 49]; %passengers in the row
@@ -78,16 +78,19 @@ function geom = defineAircraftGeometry(aircraftName)
 		ballParkEstimate(numPax, passengerConfiguration, numBatts, areaDensity);
     
 		% propulsion system estimate
-		propEst = propulsionEstimate(passengerLoadedMass * units.G_2_KG)
-		maxMass = propEst.propulsionMass + passengerLoadedMass * units.G_2_KG
-		motor = Motor(propEst.motor_v_inf, propEst.motor_T, propEst.motor_e_prop, propEst.motor_e_motor, propEst.batt_voltage);
+		propEst = propulsionEstimate(passengerLoadedMass * units.G_2_KG);
+		maxMass = propEst.propulsionMass + passengerLoadedMass * units.G_2_KG;
+		motor = Motor(propEst.motor_v_inf, propEst.motor_T, propEst.motor_e_prop, propEst.motor_e_motor, propEst.battVoltage);
+		
+		motors = cell(propEst.numMotors);
+		motors(:) = {motor};
 
 		% cruise conditions
 		v_inf = 25; % [m/s]
 		rho = 1.1; % [kg/m^2] kansas-ish
 		q_inf = 0.5 .* rho .* v_inf^2;
 
-		[wing_b, wing_S] = aeroEstimate(maxMass, v_inf)
+		[wing_b, wing_S] = aeroEstimate(maxMass, v_inf);
 		wing_C_Lmax = 1.8; % max C_L
 		wing_C_D0 = 0.02; % zero lift C_D TODO: get from XFLR5?
 		wing_e = 0.9; % oswald efficiency factor TODO: get from XFLR5?
@@ -95,12 +98,12 @@ function geom = defineAircraftGeometry(aircraftName)
 		liftSurfaces = {wing};
 
 		fuse_C_D = 2.1; % rectangular box
-		fuse_A = fuselageHeight * units.MM_2_M * fuselageWidth * units.MM_2_M %[m^2] frontal area
+		fuse_A = fuselageHeight * units.MM_2_M * fuselageWidth * units.MM_2_M; %[m^2] frontal area
 		fuse = DragSurface(fuse_A, fuse_C_D);
 		dragSurfaces = {fuse};
 
 		if (loaded)
-            mass = maxMass
+            mass = maxMass;
         else
 			mass = (emptyFuselageMass * units.G_2_KG) + propEst.propulsionMass;
         end

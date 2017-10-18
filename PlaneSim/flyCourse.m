@@ -33,6 +33,7 @@ function courseResults = flyCourse(geom, numLaps, simParams, verbose)
 
 		maxLapTime = 0;
 		minLapTime = 9999999999999999;
+		TAKEOFF_TRIGGER_ALT = 0.2; %[m] altitude where "takeoff" is recorded
 
 		% fly the course
 		for (i=1:numLaps)
@@ -55,11 +56,21 @@ function courseResults = flyCourse(geom, numLaps, simParams, verbose)
 			end
 		end
 
+		% parse data
+		startPos = sim.data.state(1).pos;
+		takeoffLength = -1;
+		for i=1:length(sim.data.state)
+			if (sim.data.state(i).pos(3) > TAKEOFF_TRIGGER_ALT)
+				takeoffLength = sim.data.state(i).calcDistToPos(startPos);
+				break;
+			end
+		end
+
 		if (verbose)
 			fprintf('==========COURSE FINISHED==========\n');
 			fprintf('NUM_LAPS: %d    simParams.CRUISE_ALT: %.2f\n', numLaps, simParams.CRUISE_ALT);
 			fprintf('Total Time: %.2fsec    Min Lap Time: %.2f    Max Lap Time: %.2f\n', sim.time, minLapTime, maxLapTime);
-			fprintf('Capacity: %.2fmAh\n', sim.data.capacity(end))
+			fprintf('Capacity: %.2fmAh      TakeoffLength: %.2f\n', sim.data.capacity(end), takeoffLength)
 			plotData(sim.data);
 		end
 
