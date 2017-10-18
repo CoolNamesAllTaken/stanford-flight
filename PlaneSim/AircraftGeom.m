@@ -14,7 +14,7 @@ classdef AircraftGeom
 			ag.mass = mass;
 			ag.liftSurfaces = liftSurfaces;
 			ag.dragSurfaces = dragSurfaces;
-			ag.motors = motors
+			ag.motors = motors;
 		end
 
 		function ag = set.liftMult(ag, liftMult)
@@ -53,7 +53,6 @@ classdef AircraftGeom
 				ret = ret + (ag.motors{i}.calcPropulsion(v_inf, throttle) .* [units.KG_2_N 1]);
 			end
 			ret(end + 1) = ag.motors{1}.battVoltage; % [T, battPower, battVoltage]
-			ret
 		end
 		function phi_max = calcphi_max(ag, q_inf)
 			% returns the maximum bank angle [rad] that could result in level flight at q_inf (assuming C_Lmax)
@@ -62,8 +61,8 @@ classdef AircraftGeom
 			liftMult = ag.liftMult;
 			ag.liftMult = 1; % set liftmult to 1 to calculate max lift (only modifies copy of ag)
 			L_max = ag.calcLift(q_inf);
-			W = ag.mass .* units.KG_2_N
-			phi_max = acos(W / L_max)
+			W = ag.mass .* units.KG_2_N;
+			phi_max = acos(W / L_max);
 		end
 	end
 end

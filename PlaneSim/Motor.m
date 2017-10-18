@@ -34,6 +34,7 @@ classdef Motor
 		function thrust = calcThrust(m, v_inf, throttle)
 		% thrust = m.calcThrust(v_inf) calculates the thrust produced by the motor m at a given speed v_inf,
 		% assuming thrust scales linearly with throttle (interpolates between static thrust and cruise thrust values)
+		% Inputs:
 		%	v_inf = [m/s] cruise speed
 		%	throttle = throttle value between 0 and 1
 			thrust = interp1(m.v_inf, m.T, v_inf) .* throttle;

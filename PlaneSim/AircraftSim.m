@@ -3,6 +3,7 @@ classdef AircraftSim
 		state % AircraftState
 		geom % AircraftGeom
 		controller % AircraftController
+		timeStep % [s] timeStep
 
 		commandAlt = 0; % [m] commanded altitude
 		commandHdg = 0; % [rad] commanded heading
@@ -11,16 +12,16 @@ classdef AircraftSim
 
 		data % contains states, etc of past simulation times
 
-		TIME_STEP = 0.1; % [s] time step for linear simulation
 		TIMEOUT_NUM_STEPS = 500; % max number of time steps before timeout
-		WAYPOINT_HIT_RADIUS = 10; % [m] how close the aircraft gets to a waypoint before it's been "hit"
+		WAYPOINT_HIT_RADIUS = 5; % [m] how close the aircraft gets to a waypoint before it's been "hit"
 		TURN_HDG_STEP = pi/2;
 	end
 	methods  
-		function as = AircraftSim(state, geom, controller)
+		function as = AircraftSim(state, geom, controller, timeStep)
 			as.state = state;
 			as.geom = geom;
 			as.controller = controller;
+            as.timeStep = timeStep;
 
 			% initialize data (used as controller inputs for first time step)
 			as.data.time = 0;
@@ -33,6 +34,11 @@ classdef AircraftSim
 			as.data.L = 0;
 			as.data.D = 0;
 			as.data.F_xyz = [0 0 0];
+
+			as.data.commandAlt = 0;
+			as.data.commandHdg = 0;
+
+			as.data.phiMax = as.controller.PHI_MAX;
 		end
 
 		function as = navToPos(as, pos)
@@ -76,18 +82,18 @@ classdef AircraftSim
 			% units
 			units = loadUnits();
 			% transformation matrices
-			AC_LONG_2_XYZ = [cos(as.state.gamma), (sin(as.state.gamma) * sin(as.state.phi)), (sin(as.state.gamma) * cos(as.state.phi))];
-			AC_VERT_2_XYZ = [-sin(as.state.gamma), (cos(as.state.gamma) * sin(as.state.phi)), (cos(as.state.gamma) * cos(as.state.phi))];
+			AC_LONG_2_XYZ = real([cos(as.state.gamma), (sin(as.state.gamma) * sin(as.state.phi)), (sin(as.state.gamma) * cos(as.state.phi))]);
+			AC_VERT_2_XYZ = real([-sin(as.state.gamma), (cos(as.state.gamma) * sin(as.state.phi)), (cos(as.state.gamma) * cos(as.state.phi))]);
 			XYZ_2_NEU = [cos(as.state.hdg), sin(as.state.hdg), 0; -sin(as.state.hdg), cos(as.state.hdg), 0; 0, 0, 1];
 
 			%% Fly the aircraft
 			% update current state variables
-			as.time = as.time + as.TIME_STEP;
+			as.time = as.time + as.timeStep;
 
 			propulsion = as.geom.calcPropulsion(as.state.v_inf, 1); % [T, battPower]
 			battPower = propulsion(2);
 			battVoltage = propulsion(3);
-			capacity = as.data.capacity(end) + (battPower / battVoltage) * as.TIME_STEP * units.AS_2_MAH;
+			capacity = as.data.capacity(end) + (battPower / battVoltage) * as.timeStep * units.AS_2_MAH;
 
 			T_xyz = propulsion(1) .* AC_LONG_2_XYZ; % [T_x T_y T_z]
 			L_xyz = as.geom.calcLift(as.state.q_inf) .* AC_VERT_2_XYZ; % [L_x L_y L_z]
@@ -98,7 +104,7 @@ classdef AircraftSim
 			F_neu = F_xyz * XYZ_2_NEU;
 
 			as.state.acc = F_neu ./ as.geom.mass;
-			as.state = as.state.update(as.TIME_STEP);
+			as.state = as.state.update(as.timeStep);
 
 			%% Control loops
 			% PD altitude control (controls lift multiplier)
@@ -108,7 +114,7 @@ classdef AircraftSim
 
 			% PD heading control (controls aircraft roll)
 			hdgErr = as.state.calcHdgDiff(as.commandHdg);
-			dHdgErr = as.state.calcHdgDiff(as.data.state(end).hdg) / as.TIME_STEP;
+			dHdgErr = as.state.calcHdgDiff(as.data.state(end).hdg) / as.timeStep;
 			as.state.phi = as.controller.controlHdg(hdgErr, dHdgErr, as.state.phi);
 
 			% ground interactions: stop aircraft from sinking into ground
@@ -128,6 +134,8 @@ classdef AircraftSim
 			as.data.L = vertcat(as.data.L, sqrt(sum(L_xyz.^2)));
 			as.data.D = vertcat(as.data.D, sqrt(sum(D_xyz.^2)));
 			as.data.F_xyz = vertcat(as.data.F_xyz, F_xyz);
+			as.data.commandAlt = vertcat(as.data.commandAlt, as.commandAlt);
+			as.data.commandHdg = vertcat(as.data.commandHdg, as.commandHdg);
 		end
 	end
 end
