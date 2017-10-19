@@ -68,7 +68,7 @@ function courseResults = flyCourse(geom, numLaps, simParams, verbose)
 
 		if (verbose)
 			fprintf('==========COURSE FINISHED==========\n');
-			fprintf('NUM_LAPS: %d    simParams.CRUISE_ALT: %.2f\n', numLaps, simParams.CRUISE_ALT);
+			fprintf('NUM_LAPS: %d    CRUISE_ALT: %.2f\n', numLaps, simParams.CRUISE_ALT);
 			fprintf('Total Time: %.2fsec    Min Lap Time: %.2f    Max Lap Time: %.2f\n', sim.time, minLapTime, maxLapTime);
 			fprintf('Capacity: %.2fmAh      TakeoffLength: %.2f\n', sim.data.capacity(end), takeoffLength)
 			plotData(sim.data);

@@ -38,26 +38,16 @@ classdef AircraftState
 
 			if (vel_x > 0)
 				% avoid dividing by 0 when aircraft is at rest
-				gamma =  atan(vel_z / vel_x);
+				gamma =  atan2(vel_z, vel_x);
 			else
 				% assume flight path angle is 0 radians if aircraft is not translating horizontally
 				gamma = 0;
 			end
 		end
 		function hdg = get.hdg(as)
-			if (as.vel(2) == 0)
-				% moving directly north or south
-				if (as.vel(1) > 0)
-					hdg = 0; % north
-				else
-					hdg = pi; % south
-				end
-			elseif (as.vel(2) > 0)
-				% moving east-ish, 0-pi
-				hdg = pi/2 - atan(as.vel(1) / as.vel(2));
-			else
-				% moving west-ish, pi-2pi
-				hdg = 3*pi/2 - atan(as.vel(1) / as.vel(2));
+			hdg = pi/2 - atan2(as.vel(1), as.vel(2));
+			if (hdg < 0)
+				hdg = 2*pi + hdg;
 			end
 		end
 
@@ -82,19 +72,9 @@ classdef AircraftState
 			diff_n = pos(1) - as.pos(1);
 			diff_e = pos(2) - as.pos(2);
 
-			if (diff_e == 0)
-				% directly north or south
-				if (diff_n > 0)
-					hdg = 0; % north
-				else
-					hdg = pi; % south
-				end
-			elseif (diff_e > 0)
-				% east-ish, 0-pi
-				hdg = pi/2 - atan(diff_n / diff_e);
-			else
-				% west-ish, pi-2pi
-				hdg = 3*pi/2 - atan(diff_n / diff_e);
+			hdg = pi/2 - atan2(diff_n, diff_e);
+			if (hdg < 0)
+				hdg = 2*pi + hdg;
 			end
 		end
 		function dist = calcDistToPos(as, pos)

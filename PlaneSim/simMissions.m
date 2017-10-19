@@ -1,7 +1,7 @@
 function scores = simMissions()
 units = loadUnits();
 
-simParams.CRUISE_ALT = 20; % [m]
+simParams.CRUISE_ALT = 40; % [m]
 simParams.CRUISE_V_INF = 20; % [m/s], estimate used to calculate phi_max
 simParams.RHO = 1.1; % [kg/m^3], kansas-ish
 
@@ -54,9 +54,9 @@ for i = 1:length(paxList)
 	% fly M2
 	fprintf('===== MISSION 2 =====')
 	geom = defineAircraftGeometry(['DBF18-' num2str(pax) '-full']);
-	mission2Results(i) = flyCourse(geom, 3, simParams, true)
-	mission2Scores(i) = 2 * pax / mission2Results(i).time / MAX_PASSENGERS_TIME % NOT COUNTING COMPETITORS
-	fprintf('Mission 2 Complete\nScore: %.2f\n', mission2Scores(i))
+	mission2Results(i) = flyCourse(geom, 3, simParams, true);
+	mission2Scores(i) = 2 * pax / mission2Results(i).time / MAX_PASSENGERS_TIME;
+	fprintf('Mission 2 Complete\nScore: %.2f\n', mission2Scores(i));
 
 	% fly M3
     mission3Scores(i) = 0; % PLACEHOLDER
