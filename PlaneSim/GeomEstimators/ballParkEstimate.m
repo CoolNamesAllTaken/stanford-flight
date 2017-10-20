@@ -32,13 +32,23 @@ function[emptyFuselageWeight, passengerLoadedWeight, fuselageLength, fuselageWid
 	figure();
 	hist(passengerDiameters,[27 32 38 45 49]);
 
-	%passengers added in groups of 4
+	%passengers added in groups of 2 or 4
 	aisleWidth = 2*units.IN_2_MM;
 	aisleHeight = 2*units.IN_2_MM;
 	marginHeight = .25*units.IN_2_MM; 
-	numRows = numPassengers/4;
-	longitudinalSpacing = .25*units.IN_2_MM;
-	edgeSpacing = 1*units.IN_2_MM;
+    longitudinalSpacing = .25*units.IN_2_MM;
+    
+    if(numPassengers < 20)
+        numRows = numPassengers/2;
+        edgeSpacing = .5*units.IN_2_MM;
+   
+    else
+        numRows = numPassengers/4;
+        edgeSpacing = 1*units.IN_2_MM;
+
+    end
+	
+	
 
 	%empty fuselage - equally spaced rows that can accomade 2x49mm passenger
 	%per row
@@ -55,9 +65,12 @@ function[emptyFuselageWeight, passengerLoadedWeight, fuselageLength, fuselageWid
 	generatedPassengerVolume = (passengerArea+marginArea) *(passengerCompartmentHeight);
 	totalPassengerWeight = sum(passengerWeights);
 
-	batDiameter = 14.5;
-	batsPerRow = numBats/16; %16 14.5mm batteries fit per row with given fuselage width
-	electronicsBayLength = batsPerRow*batDiameter; %batteries/ESCs/storage/etc - add in once we calculate
+	%electronics info - so far accounts just for batteries - add in more
+	%space for different components later
+    batDiameter = 14.5;
+	batsPerRow = floor((numBats*14.5)/passengerCompartmentWidth); % 14.5mm batteries fit per row with given fuselage width
+    electronicsBayLength = (batDiameter*ceil(numBats/batsPerRow)) + (1*units.IN_2_MM); %batteries
+
 	fuselageHeight = (3/2)*passengerCompartmentHeight; %assumes luggage compartment is half the area as passenger compartment
 	fuselageLength = passengerCompartmentLength + electronicsBayLength;
 	fuselageWidth = passengerCompartmentWidth;
