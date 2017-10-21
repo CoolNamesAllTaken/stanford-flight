@@ -23,14 +23,14 @@ function geom = defineAircraftGeometry(aircraftName)
 		fuse = DragSurface(fuse_A, fuse_C_D);
 		dragSurfaces = {fuse};
 
-		motor_v_inf = [0.0 21.03 26.11]; % [m/s] static, cruise
-		motor_T = [1.204 0.239 0]; % [kg] static, cruise
-		motor_e_prop = [0.0048 0.00307 0]; % [kg/W] static, cruise
-		motor_e_motor = 0.795; % static and cruise
+		motor_v_inf = [0.0 21.03 26.11]; % [m/s] static, cruise, pitch
+		motor_T = [1.204 0.239 0]; % [kg] static, cruise, pitch
+		motor_battPower = 248.5; % [W] battery power at max throttle
 		battVoltage = 14; % [V] loaded voltage
-		motor = Motor(motor_v_inf, motor_T, motor_e_prop, motor_e_motor, battVoltage);
+		battCapacity = 3000; % [mAh]
+		motor = Motor(motor_v_inf, motor_T, motor_battPower);
 
-		geom = AircraftGeom('Little Pucker', mass, liftSurfaces, dragSurfaces, {motor});
+		geom = AircraftGeom('Little Pucker', mass, battVoltage, battCapacity, liftSurfaces, dragSurfaces, {motor});
 	elseif(strcmpi(aircraftName, 'LittlePucker-Empty'))
 		mass = 1.00; % [kg]
 

@@ -57,10 +57,10 @@ function courseResults = flyCourse(geom, maxLaps, simParams, verbose)
 				minLapTime = lapTime;
 			end
 			if (sim.geom.battCapacity < battCapacity_reserve);
-				fprintf('lap %d FAILED (out of battery)', numLaps);
+				fprintf('lap %d FAILED (out of battery)\n', numLaps);
 				break
 			elseif (sim.time > MAX_FLIGHT_TIME)
-				fprintf('lap %d FAILED (out of time)', numLaps);
+				fprintf('lap %d FAILED (out of time)\n', numLaps);
 				break
 			else
 				fprintf('lap %d complete time=%.2f capacity=%.2f\n', numLaps, sim.time, sim.geom.battCapacity);
@@ -82,7 +82,7 @@ function courseResults = flyCourse(geom, maxLaps, simParams, verbose)
 			fprintf('==========COURSE FINISHED==========\n');
 			fprintf('NUM_LAPS: %d    CRUISE_ALT: %.2f\n', numLaps, simParams.CRUISE_ALT);
 			fprintf('Total Time: %.2fsec    Min Lap Time: %.2f    Max Lap Time: %.2f\n', sim.time, minLapTime, maxLapTime);
-			fprintf('Capacity: %.2fmAh      TakeoffLength: %.2f\n', sim.data.capacity(end), takeoffLength)
+			fprintf('Capacity: %.2fmAh      TakeoffLength: %.2f\n', sim.data.battCapacity(end), takeoffLength)
 			plotData(sim.data);
 		end
 
@@ -90,5 +90,5 @@ function courseResults = flyCourse(geom, maxLaps, simParams, verbose)
 		courseResults.numLaps = numLaps;
 		courseResults.minLapTime = minLapTime;
 		courseResults.maxLapTime = maxLapTime;
-		courseResults.capacity = sim.data.capacity(end);
+		courseResults.battCapacity = sim.data.battCapacity(end);
 	end

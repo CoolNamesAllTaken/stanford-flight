@@ -2,29 +2,25 @@ classdef Motor
 	properties
 		v_inf % [m/s] freestream velocity for other properties [idle, cruise]
 		T % [kg] motor max thrust [idle, cruise]
-		e_prop % propeller efficiency factor [idle, cruise]
-		e_motor % motor efficiency factor
+		battPower % motor maximum battery power
 	end
 	methods
-		function m = Motor(v_inf, T, e_prop, e_motor)
-		% m = Motor(e_prop, e_motor, T, v_inf) creates a motor object.  NOTE: v_inf, T, e_prop are variable
+		function m = Motor(v_inf, T, battPower)
+		% m = Motor(e_prop, e_motor, T, v_inf) creates a motor object.  NOTE: v_inf, T, are variable
 		% arrays used to interpret motor properties for all phases of flight.  Recommend at least two values
 		% per input, in the form [idle, cruise]
 		%	v_inf = [m/s] freestream velocity for other properties
 		%	T = [kg] motor max thrust
-		%	e_prop = [kg/W] propeller specific thrust
-		%	e_motor = [unitless] motor efficiency factor at cruise (shaft power / electric power)
+		%	power = [W] motor power at max throttle
 			% motor produces 0 thrust at infinite speed (avoid issues when flying faster than pitch speed)
 			m.v_inf = [v_inf, 999999999];
 			m.T = [T, 0];
-			m.e_prop = [e_prop, 0];
-			m.e_motor = e_motor;
+			m.battPower = battPower; % 0 power at 0 throttle
 		end
 
 		function ret = calcPropulsion(m, v_inf, throttle)
 			thrust = m.calcThrust(v_inf, throttle);
-			motorPower = m.calcMotorPower(v_inf, thrust);
-			battPower = m.calcBattPower(motorPower);
+			battPower = m.calcBattPower(throttle);
 			ret = [thrust battPower]; % [kg, W]
 		end
 
@@ -34,23 +30,15 @@ classdef Motor
 		% Inputs:
 		%	v_inf = [m/s] cruise speed
 		%	throttle = throttle value between 0 and 1
-			thrust = interp1(m.v_inf, m.T, v_inf) .* throttle;
+			thrust = interp1(m.v_inf, m.T, v_inf) * throttle;
 		end
 
-		function motorPower = calcMotorPower(m, v_inf, T)
-		% motorPower = m.calcMotorPower(v_inf, T) calculates the shaft power of the motor m motorPower,
-		% required to create thrust force T at cruise speed v_inf
-		%	v_inf = [m/s] cruise speed
-		%	T = [kg] thrust force
-			e_prop = interp1(m.v_inf, m.e_prop, v_inf);
-			motorPower = T ./ e_prop;
-		end
-
-		function battPower = calcBattPower(m, motorPower)
+		function battPower = calcBattPower(m, throttle)
 		% battPower = m.calcBattPower(motorPower) calculates the electrical power provided provided by the
-		% batteries to a motor m producing motorPower watts of shaft power
-		%	motorPower = [W] motor shaft power
-			battPower = motorPower ./ m.e_motor;
+		% batteries to a motor m running at throttle setting throttle
+		% Inputs:
+		%	throttle = throttle value between 0 and 1
+			battPower = m.battPower * throttle;
 		end
 	end
 end

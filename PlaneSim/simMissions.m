@@ -45,7 +45,7 @@ for i = 1:length(paxList)
 	pax = paxList(i);
 
 	% fly M1
-	fprintf('===== MISSION 1 =====')
+	fprintf('===== MISSION 1 =====\n')
 	geom = defineAircraftGeometry(['DBF18-' num2str(pax) '-empty']);
 	mission1Results(i) = flyCourse(geom, 3, simParams, true)
 	mission1Scores(i) = 1.0;
@@ -53,15 +53,14 @@ for i = 1:length(paxList)
     
     rac(i) = geom.mass * geom.liftSurfaces{1}.b;
 	% fly M2
-	fprintf('===== MISSION 2 =====')
+	fprintf('===== MISSION 2 =====\n')
 	geom = defineAircraftGeometry(['DBF18-' num2str(pax) '-full']);
 	mission2Results(i) = flyCourse(geom, 3, simParams, true);
 	mission2Scores(i) = 2 * pax / mission2Results(i).time / MAX_PAX_TIME;
 	fprintf('Mission 2 Complete\nScore: %.2f\n', mission2Scores(i));
 
 	% fly M3
-    mission3Scores(i) = 0; % PLACEHOLDER
-    fprintf('===== MISSION 3 =====')
+    fprintf('===== MISSION 3 =====\n')
 	geom = defineAircraftGeometry(['DBF18-' num2str(pax) '-full']);
 	mission3Results(i) = flyCourse(geom, 99999, simParams, true);
 	m3Pax = pax / 2; % assume 50% pax, the rest as payload

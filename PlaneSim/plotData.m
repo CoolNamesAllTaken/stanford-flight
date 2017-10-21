@@ -40,32 +40,37 @@ function plotData(data)
 	figure('name', 'Data');
 	a = gobjects(0);
 
-	a = vertcat(a, subplot(6, 1, 1));
-	plot(data.time, data.capacity);
+	a = vertcat(a, subplot(7, 1, 1));
+	plot(data.time, data.battPower);
+	grid on;
+	ylabel('Battery Power [W]');
+
+	a = vertcat(a, subplot(7, 1, 2));
+	plot(data.time, data.battCapacity);
 	grid on;
 	ylabel('Capacity [mAh]');
 
-	a = vertcat(a, subplot(6, 1, 2));
+	a = vertcat(a, subplot(7, 1, 3));
 	plot(data.time, pos_u);
 	grid on;
 	ylabel('Alt [m]');
 
-	a = vertcat(a, subplot(6, 1, 3));
+	a = vertcat(a, subplot(7, 1, 4));
 	plot(data.time, data.v_inf);
 	grid on;
 	ylabel('v_{inf} [m/s]');
 
-	a = vertcat(a, subplot(6, 1, 4));
+	a = vertcat(a, subplot(7, 1, 5));
 	plot(data.time, data.T);
 	grid on;
 	ylabel('Thrust [N]');
 
-	a = vertcat(a, subplot(6, 1, 5));
+	a = vertcat(a, subplot(7, 1, 6));
 	plot(data.time, data.L);
 	grid on;
 	ylabel('Lift [N]');
 
-	a = vertcat(a, subplot(6, 1, 6));
+	a = vertcat(a, subplot(7, 1, 7));
 	plot(data.time, data.D);
 	grid on;
 	ylabel('Drag [N]');
