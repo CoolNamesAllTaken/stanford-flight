@@ -4,11 +4,9 @@ classdef Motor
 		T % [kg] motor max thrust [idle, cruise]
 		e_prop % propeller efficiency factor [idle, cruise]
 		e_motor % motor efficiency factor
-
-		battVoltage % [V] battery voltage under load
 	end
 	methods
-		function m = Motor(v_inf, T, e_prop, e_motor, battVoltage)
+		function m = Motor(v_inf, T, e_prop, e_motor)
 		% m = Motor(e_prop, e_motor, T, v_inf) creates a motor object.  NOTE: v_inf, T, e_prop are variable
 		% arrays used to interpret motor properties for all phases of flight.  Recommend at least two values
 		% per input, in the form [idle, cruise]
@@ -21,7 +19,6 @@ classdef Motor
 			m.T = [T, 0];
 			m.e_prop = [e_prop, 0];
 			m.e_motor = e_motor;
-			m.battVoltage = battVoltage;
 		end
 
 		function ret = calcPropulsion(m, v_inf, throttle)

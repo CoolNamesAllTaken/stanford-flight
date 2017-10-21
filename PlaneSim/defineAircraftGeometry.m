@@ -80,9 +80,9 @@ function geom = defineAircraftGeometry(aircraftName)
 		% propulsion system estimate
 		propEst = propulsionEstimate(passengerLoadedMass * units.G_2_KG);
 		maxMass = propEst.propulsionMass + passengerLoadedMass * units.G_2_KG;
-		motor = Motor(propEst.motor_v_inf, propEst.motor_T, propEst.motor_e_prop, propEst.motor_e_motor, propEst.battVoltage);
+		motor = Motor(propEst.motor_v_inf, propEst.motor_T, propEst.motor_e_prop, propEst.motor_e_motor);
 		
-		motors = cell(propEst.numMotors, 1);
+		motors = cell(propEst.numMotors, 1); % numMotors of the same motor
 		motors(:) = {motor};
 
 		% cruise conditions
@@ -107,7 +107,8 @@ function geom = defineAircraftGeometry(aircraftName)
         else
 			mass = (emptyFuselageMass * units.G_2_KG) + propEst.propulsionMass;
         end
-        fprintf('Max Mass: %.2f Current Mass: %.2f', maxMass, mass);
-		geom = AircraftGeom(['DBF18 ' num2str(numPax) ' ' loadedStr], mass, liftSurfaces, dragSurfaces, motors)
+        fprintf('Max Mass: %.2f Current Mass: %.2f\n', maxMass, mass);
+		geom = AircraftGeom(['DBF18 ' num2str(numPax) ' ' loadedStr], mass, propEst.battVoltage, propEst.battCapacity, ...
+			liftSurfaces, dragSurfaces, motors);
 	end
 end

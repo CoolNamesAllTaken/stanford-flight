@@ -36,13 +36,14 @@ function plotData(data)
 	grid on;
 	view(-30, 30);
 
+	%% Data
 	figure('name', 'Data');
 	a = gobjects(0);
 
 	a = vertcat(a, subplot(6, 1, 1));
-	plot(data.time, pos_n);
+	plot(data.time, data.capacity);
 	grid on;
-	ylabel('Pos [m]');
+	ylabel('Capacity [mAh]');
 
 	a = vertcat(a, subplot(6, 1, 2));
 	plot(data.time, pos_u);
@@ -69,10 +70,12 @@ function plotData(data)
 	grid on;
 	ylabel('Drag [N]');
 
-
 	linkaxes(a, 'x');
 	xlabel('Time [s]');
 
+	%% Velocity Components
+	figure('name', 'Velocity Components');
+	a = gobjects(0);
 	vel_n = [];
 	vel_e = [];
 	vel_u = [];
@@ -81,8 +84,6 @@ function plotData(data)
 		vel_e = [vel_e, data.state(i).vel(2)];
 		vel_u = [vel_u, data.state(i).vel(3)];
 	end
-	figure('name', 'Velocity Components');
-	a = gobjects(0);
 
 	a = vertcat(a, subplot(4, 1, 1));
 	plot(data.time(:), vel_n);
@@ -107,6 +108,7 @@ function plotData(data)
 	linkaxes(a, 'x');
 	xlabel('Time [s]');
 
+	%% Forces
 	figure('name', 'Forces');
 	a = gobjects(0);
 
@@ -128,6 +130,7 @@ function plotData(data)
 	linkaxes(a, 'x');
 	xlabel('Time [s]');
 
+	%% Angles
 	figure('name', 'Angles');
 	a = gobjects(0);
 
@@ -153,9 +156,4 @@ function plotData(data)
 	plot(data.time, data.commandHdg);
 	grid on;
 	ylabel('command heading [rad]')
-
-	% a = vertcat(a, subplot(4, 1, 4));
-	% plot(data.time, data.hdgDiff(:, 1));
-	% grid on;
-	% ylabel('heading Difference [rad]');
 end

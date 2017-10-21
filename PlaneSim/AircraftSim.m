@@ -92,8 +92,8 @@ classdef AircraftSim
 
 			propulsion = as.geom.calcPropulsion(as.state.v_inf, 1); % [T, battPower]
 			battPower = propulsion(2);
-			battVoltage = propulsion(3);
-			capacity = as.data.capacity(end) + (battPower / battVoltage) * as.timeStep * units.AS_2_MAH;
+			as.geom.battCapacity = as.geom.battCapacity - (battPower / as.geom.battVoltage * as.timeStep * units.AS_2_MAH);
+			capacity = as.geom.battCapacity;
 
 			T_xyz = propulsion(1) .* AC_LONG_2_XYZ; % [T_x T_y T_z]
 			L_xyz = as.geom.calcLift(as.state.q_inf) .* AC_VERT_2_XYZ; % [L_x L_y L_z]

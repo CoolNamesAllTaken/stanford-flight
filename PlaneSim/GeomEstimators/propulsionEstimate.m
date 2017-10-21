@@ -19,7 +19,6 @@ function results = propulsionEstimate(dryMassIn)
 % 	motor_T       :  [2.987, 0.726, 0]
 % 	motor_e_prop  :  [0.004034850736188032, 0.004030000000000001, 0]
 % 	motor_e_motor :  0.804
-dryMassIn
 dryMass = [2.5, 4, 7.5];
 totalMass = [4.156, 6.240, 10.500];
 
@@ -37,7 +36,7 @@ motor_e_prop.pitch = 0;
 motor_e_motor = [0.816, 0.812, 0.804];
 
 battVoltage = [9, 10, 16]; % [V] assume 1V per cell under load
-capacity = []
+battCapacity = [14000, 17500, 17500]
 numMotors = 2;
 
 figure()
@@ -49,6 +48,7 @@ results.motor_T = [interp1(dryMass, motor_T.static, dryMassIn), interp1(dryMass,
 results.motor_e_prop = [interp1(dryMass, motor_e_prop.static, dryMassIn), interp1(dryMass, motor_e_prop.cruise, dryMassIn), motor_e_prop.pitch];
 results.motor_e_motor = interp1(dryMass, motor_e_motor, dryMassIn);
 results.battVoltage = round(interp1(dryMass, battVoltage, dryMassIn));
+results.battCapacity = round(interp1(dryMass, battCapacity, dryMassIn));
 results.numMotors = numMotors;
 
 results.propulsionMass = results.totalMass - dryMassIn;

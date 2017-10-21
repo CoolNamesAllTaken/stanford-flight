@@ -1,9 +1,9 @@
-function courseResults = flyCourse(geom, numLaps, simParams, verbose)
-	% Flies numLaps laps around the course using an aircraft geometry object geom.  Takes in a struct simParams
+function courseResults = flyCourse(geom, maxLaps, simParams, verbose)
+	% Flies maxLaps laps around the course using an aircraft geometry object geom.  Takes in a struct simParams
 	% that configures simulator settings (control gains, flight conditions, etc).
 	% Inputs
 	%	geom = AircraftGeometry object
-	%	numLaps = num laps to fly around the course
+	%	maxLaps = num laps to fly around the course
 	%	simParams.CRUISE_ALT = [m] cruising altitude
 	%	simParams.CRUISE_V_INF = [m/s] estimate used to calculate phi_max
 	%	simparams.RHO = [kg/m^3] air density
@@ -33,10 +33,13 @@ function courseResults = flyCourse(geom, numLaps, simParams, verbose)
 
 		maxLapTime = 0;
 		minLapTime = 9999999999999999;
-		TAKEOFF_TRIGGER_ALT = 0.2; %[m] altitude where "takeoff" is recorded
+		TAKEOFF_TRIGGER_ALT = 0.2; % [m] altitude where "takeoff" is recorded
+		MAX_FLIGHT_TIME = 600; % [s] 10 min flight window
 
 		% fly the course
-		for (i=1:numLaps)
+		battCapacity_reserve = sim.geom.battCapacity * 0.15; % fly to 85% capacity
+		numLaps = 0;
+		while (numLaps < maxLaps)
 			startTime = sim.time;
 			sim = sim.navToPos([0, PYLON_DIST, simParams.CRUISE_ALT]);
 			fprintf('p1 ')
@@ -46,13 +49,22 @@ function courseResults = flyCourse(geom, numLaps, simParams, verbose)
 			sim = sim.navToPos([COURSE_WIDTH, -PYLON_DIST, simParams.CRUISE_ALT]);
 			fprintf('p3 ')
 			sim = sim.navToPos([0, 0, simParams.CRUISE_ALT]);
-			fprintf('lap %d\n', i)
 			endTime = sim.time;
 			lapTime = endTime - startTime;
 			if (lapTime > maxLapTime)
 				maxLapTime = lapTime;
 			elseif (lapTime < minLapTime)
 				minLapTime = lapTime;
+			end
+			if (sim.geom.battCapacity < battCapacity_reserve);
+				fprintf('lap %d FAILED (out of battery)', numLaps);
+				break
+			elseif (sim.time > MAX_FLIGHT_TIME)
+				fprintf('lap %d FAILED (out of time)', numLaps);
+				break
+			else
+				fprintf('lap %d complete time=%.2f capacity=%.2f\n', numLaps, sim.time, sim.geom.battCapacity);
+				numLaps = numLaps + 1;
 			end
 		end
 
@@ -75,6 +87,7 @@ function courseResults = flyCourse(geom, numLaps, simParams, verbose)
 		end
 
 		courseResults.time = sim.time;
+		courseResults.numLaps = numLaps;
 		courseResults.minLapTime = minLapTime;
 		courseResults.maxLapTime = maxLapTime;
 		courseResults.capacity = sim.data.capacity(end);

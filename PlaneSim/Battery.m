@@ -5,12 +5,13 @@ classdef Battery
 	end
 	methods
 		function b = Battery(voltage, capacity)
-			b.voltage - voltage;
+			b.voltage = voltage;
 			b.capacity = capacity;
 		end
 
 		function b = discharge(b, battPower, time)
-			b.capacity = b.capacity - (battPower / b.voltage) * time * units.AS_2_MAH;
+			units = loadUnits();
+			b.capacity = b.capacity - (battPower / b.voltage * time * units.AS_2_MAH);
 		end
 	end
 end
