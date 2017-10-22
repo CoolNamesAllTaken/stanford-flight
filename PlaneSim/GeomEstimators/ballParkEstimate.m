@@ -2,6 +2,7 @@ function[emptyFuselageWeight, passengerLoadedWeight, fuselageLength, fuselageWid
 	ballparkEstimate(numPassengers, passengerConfiguration, numBats, areaDensity)
 
 	units = loadUnits();
+	STRUCTURAL_WEIGHT_FUDGE_FACTOR = 1.5; % multiply weight by this to account for wings etc
 
 	passengerWeightsDistribution = [0.40 0.67 1.12 1.85 2.39]; %oz
 	pd = [ 27 0.15; 32 0.20; 38 0.30; 45 0.20; 49 0.15];
@@ -47,8 +48,6 @@ function[emptyFuselageWeight, passengerLoadedWeight, fuselageLength, fuselageWid
         edgeSpacing = 1*units.IN_2_MM;
 
     end
-	
-	
 
 	%empty fuselage - equally spaced rows that can accomade 2x49mm passenger
 	%per row
@@ -76,6 +75,7 @@ function[emptyFuselageWeight, passengerLoadedWeight, fuselageLength, fuselageWid
 	fuselageWidth = passengerCompartmentWidth;
 
 	%in grams
-	emptyFuselageWeight = areaDensity*(2*(fuselageHeight*fuselageWidth)+2*(fuselageLength*fuselageHeight) + 3*(fuselageLength*fuselageWidth));
+	emptyFuselageWeight = (areaDensity*(2*(fuselageHeight*fuselageWidth)+2*(fuselageLength*fuselageHeight) + ...
+		3*(fuselageLength*fuselageWidth))) * STRUCTURAL_WEIGHT_FUDGE_FACTOR;
 	passengerLoadedWeight = emptyFuselageWeight + totalPassengerWeight;
 end

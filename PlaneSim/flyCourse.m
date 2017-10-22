@@ -37,7 +37,7 @@ function courseResults = flyCourse(geom, maxLaps, simParams, verbose)
 		MAX_FLIGHT_TIME = 600; % [s] 10 min flight window
 
 		% fly the course
-		battCapacity_reserve = sim.geom.battCapacity * 0.15; % fly to 85% capacity
+		battCapacity_reserve = sim.geom.battCapacity * 0.3; % fly to 70% capacity
 		numLaps = 0;
 		while (numLaps < maxLaps)
 			startTime = sim.time;
@@ -82,7 +82,7 @@ function courseResults = flyCourse(geom, maxLaps, simParams, verbose)
 			fprintf('==========COURSE FINISHED==========\n');
 			fprintf('NUM_LAPS: %d    CRUISE_ALT: %.2f\n', numLaps, simParams.CRUISE_ALT);
 			fprintf('Total Time: %.2fsec    Min Lap Time: %.2f    Max Lap Time: %.2f\n', sim.time, minLapTime, maxLapTime);
-			fprintf('Capacity: %.2fmAh      TakeoffLength: %.2f\n', sim.data.battCapacity(end), takeoffLength)
+			fprintf('Capacity: %.2fmAh      TakeoffLength: %.2f\n', sim.data.battCapacity(end), takeoffLength);
 			plotData(sim.data);
 		end
 

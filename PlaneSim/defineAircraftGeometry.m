@@ -75,12 +75,12 @@ function geom = defineAircraftGeometry(aircraftName)
 		areaDensityFoam = 110/(20*29.5*(inchToMiliConversion^2)); % g/mm^2  20x29.5in 110g 
 		areaDensity = areaDensityFoam*1.5; %reinforced
 		[emptyFuselageMass, passengerLoadedMass, fuselageLength, fuselageWidth, fuselageHeight] = ...
-		ballParkEstimate(numPax, passengerConfiguration, numBatts, areaDensity);
+		ballParkEstimate(numPax, passengerConfiguration, numBatts, areaDensity)
     
 		% propulsion system estimate
 		propEst = propulsionEstimate(passengerLoadedMass * units.G_2_KG);
 		maxMass = propEst.propulsionMass + passengerLoadedMass * units.G_2_KG;
-		motor = Motor(propEst.motor_v_inf, propEst.motor_T, propEst.motor_e_prop, propEst.motor_e_motor);
+		motor = Motor(propEst.motor_v_inf, propEst.motor_T, propEst.motor_battPower);
 		
 		motors = cell(propEst.numMotors, 1); % numMotors of the same motor
 		motors(:) = {motor};
