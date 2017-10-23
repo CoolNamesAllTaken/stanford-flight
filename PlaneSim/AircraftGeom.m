@@ -2,6 +2,8 @@ classdef AircraftGeom
 	properties
 		name = '';
 		mass = 0; % [kg] mass of aircraft (AUW)
+		battVoltage = 0; % [V] battery voltage
+		battCapacity = 0; % [mAh] battery capacity
 
 		liftMult = 1;
 		liftSurfaces = {};
@@ -9,9 +11,12 @@ classdef AircraftGeom
 		motors = {};
 	end
 	methods  
-		function ag = AircraftGeom(name, mass, liftSurfaces, dragSurfaces, motors)
+		function ag = AircraftGeom(name, mass, battVoltage, battCapacity, liftSurfaces, dragSurfaces, motors)
 			ag.name = name;
 			ag.mass = mass;
+			ag.battVoltage = battVoltage;
+			ag.battCapacity = battCapacity;
+
 			ag.liftSurfaces = liftSurfaces;
 			ag.dragSurfaces = dragSurfaces;
 			ag.motors = motors;
@@ -52,7 +57,6 @@ classdef AircraftGeom
 			for i = 1:length(ag.motors)
 				ret = ret + (ag.motors{i}.calcPropulsion(v_inf, throttle) .* [units.KG_2_N 1]);
 			end
-			ret(end + 1) = ag.motors{1}.battVoltage; % [T, battPower, battVoltage]
 		end
 		function phi_max = calcphi_max(ag, q_inf)
 			% returns the maximum bank angle [rad] that could result in level flight at q_inf (assuming C_Lmax)

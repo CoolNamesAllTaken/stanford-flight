@@ -36,43 +36,51 @@ function plotData(data)
 	grid on;
 	view(-30, 30);
 
+	%% Data
 	figure('name', 'Data');
 	a = gobjects(0);
 
-	a = vertcat(a, subplot(6, 1, 1));
-	plot(data.time, pos_n);
+	a = vertcat(a, subplot(7, 1, 1));
+	plot(data.time, data.battPower);
 	grid on;
-	ylabel('Pos [m]');
+	ylabel('Battery Power [W]');
 
-	a = vertcat(a, subplot(6, 1, 2));
+	a = vertcat(a, subplot(7, 1, 2));
+	plot(data.time, data.battCapacity);
+	grid on;
+	ylabel('Capacity [mAh]');
+
+	a = vertcat(a, subplot(7, 1, 3));
 	plot(data.time, pos_u);
 	grid on;
 	ylabel('Alt [m]');
 
-	a = vertcat(a, subplot(6, 1, 3));
+	a = vertcat(a, subplot(7, 1, 4));
 	plot(data.time, data.v_inf);
 	grid on;
 	ylabel('v_{inf} [m/s]');
 
-	a = vertcat(a, subplot(6, 1, 4));
+	a = vertcat(a, subplot(7, 1, 5));
 	plot(data.time, data.T);
 	grid on;
 	ylabel('Thrust [N]');
 
-	a = vertcat(a, subplot(6, 1, 5));
+	a = vertcat(a, subplot(7, 1, 6));
 	plot(data.time, data.L);
 	grid on;
 	ylabel('Lift [N]');
 
-	a = vertcat(a, subplot(6, 1, 6));
+	a = vertcat(a, subplot(7, 1, 7));
 	plot(data.time, data.D);
 	grid on;
 	ylabel('Drag [N]');
 
-
 	linkaxes(a, 'x');
 	xlabel('Time [s]');
 
+	%% Velocity Components
+	figure('name', 'Velocity Components');
+	a = gobjects(0);
 	vel_n = [];
 	vel_e = [];
 	vel_u = [];
@@ -81,8 +89,6 @@ function plotData(data)
 		vel_e = [vel_e, data.state(i).vel(2)];
 		vel_u = [vel_u, data.state(i).vel(3)];
 	end
-	figure('name', 'Velocity Components');
-	a = gobjects(0);
 
 	a = vertcat(a, subplot(4, 1, 1));
 	plot(data.time(:), vel_n);
@@ -107,6 +113,7 @@ function plotData(data)
 	linkaxes(a, 'x');
 	xlabel('Time [s]');
 
+	%% Forces
 	figure('name', 'Forces');
 	a = gobjects(0);
 
@@ -128,6 +135,7 @@ function plotData(data)
 	linkaxes(a, 'x');
 	xlabel('Time [s]');
 
+	%% Angles
 	figure('name', 'Angles');
 	a = gobjects(0);
 
@@ -153,9 +161,4 @@ function plotData(data)
 	plot(data.time, data.commandHdg);
 	grid on;
 	ylabel('command heading [rad]')
-
-	% a = vertcat(a, subplot(4, 1, 4));
-	% plot(data.time, data.hdgDiff(:, 1));
-	% grid on;
-	% ylabel('heading Difference [rad]');
 end

@@ -23,14 +23,14 @@ function geom = defineAircraftGeometry(aircraftName)
 		fuse = DragSurface(fuse_A, fuse_C_D);
 		dragSurfaces = {fuse};
 
-		motor_v_inf = [0.0 21.03 26.11]; % [m/s] static, cruise
-		motor_T = [1.204 0.239 0]; % [kg] static, cruise
-		motor_e_prop = [0.0048 0.00307 0]; % [kg/W] static, cruise
-		motor_e_motor = 0.795; % static and cruise
+		motor_v_inf = [0.0 21.03 26.11]; % [m/s] static, cruise, pitch
+		motor_T = [1.204 0.239 0]; % [kg] static, cruise, pitch
+		motor_battPower = 248.5; % [W] battery power at max throttle
 		battVoltage = 14; % [V] loaded voltage
-		motor = Motor(motor_v_inf, motor_T, motor_e_prop, motor_e_motor, battVoltage);
+		battCapacity = 3000; % [mAh]
+		motor = Motor(motor_v_inf, motor_T, motor_battPower);
 
-		geom = AircraftGeom('Little Pucker', mass, liftSurfaces, dragSurfaces, {motor});
+		geom = AircraftGeom('Little Pucker', mass, battVoltage, battCapacity, liftSurfaces, dragSurfaces, {motor});
 	elseif(strcmpi(aircraftName, 'LittlePucker-Empty'))
 		mass = 1.00; % [kg]
 
@@ -69,7 +69,11 @@ function geom = defineAircraftGeometry(aircraftName)
 		loaded = strcmpi(loadedStr, 'full');
 
 		% estimate fuselage structural weight
-		passengerConfiguration = [32 32 49 49]; %passengers in the row
+		if numPax < 20
+			passengerConfiguration = [32 49]; % skinny fuselage passengers in row
+		else
+			passengerConfiguration = [32 32 49 49]; % wide fuselage passengers in the row
+		end
 		numBatts = round(1.6 * numPax); % approximated from 116 batts : 70 pax estimate
 		inchToMiliConversion = 25.4;
 		areaDensityFoam = 110/(20*29.5*(inchToMiliConversion^2)); % g/mm^2  20x29.5in 110g 
@@ -80,9 +84,9 @@ function geom = defineAircraftGeometry(aircraftName)
 		% propulsion system estimate
 		propEst = propulsionEstimate(passengerLoadedMass * units.G_2_KG);
 		maxMass = propEst.propulsionMass + passengerLoadedMass * units.G_2_KG;
-		motor = Motor(propEst.motor_v_inf, propEst.motor_T, propEst.motor_e_prop, propEst.motor_e_motor, propEst.battVoltage);
+		motor = Motor(propEst.motor_v_inf, propEst.motor_T, propEst.motor_battPower);
 		
-		motors = cell(propEst.numMotors);
+		motors = cell(propEst.numMotors, 1); % numMotors of the same motor
 		motors(:) = {motor};
 
 		% cruise conditions
@@ -107,7 +111,8 @@ function geom = defineAircraftGeometry(aircraftName)
         else
 			mass = (emptyFuselageMass * units.G_2_KG) + propEst.propulsionMass;
         end
-        fprintf('Max Mass: %.2f Current Mass: %.2f', maxMass, mass);
-		geom = AircraftGeom(['DBF18 ' num2str(numPax) ' ' loadedStr], mass, liftSurfaces, dragSurfaces, {motor})
+        fprintf('Max Mass: %.2f Current Mass: %.2f\n', maxMass, mass);
+		geom = AircraftGeom(['DBF18 ' num2str(numPax) ' ' loadedStr], mass, propEst.battVoltage, propEst.battCapacity, ...
+			liftSurfaces, dragSurfaces, motors);
 	end
 end
