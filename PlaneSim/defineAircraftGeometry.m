@@ -69,13 +69,17 @@ function geom = defineAircraftGeometry(aircraftName)
 		loaded = strcmpi(loadedStr, 'full');
 
 		% estimate fuselage structural weight
-		passengerConfiguration = [32 32 49 49]; %passengers in the row
+		if numPax < 20
+			passengerConfiguration = [32 49]; % skinny fuselage passengers in row
+		else
+			passengerConfiguration = [32 32 49 49]; % wide fuselage passengers in the row
+		end
 		numBatts = round(1.6 * numPax); % approximated from 116 batts : 70 pax estimate
 		inchToMiliConversion = 25.4;
 		areaDensityFoam = 110/(20*29.5*(inchToMiliConversion^2)); % g/mm^2  20x29.5in 110g 
 		areaDensity = areaDensityFoam*1.5; %reinforced
 		[emptyFuselageMass, passengerLoadedMass, fuselageLength, fuselageWidth, fuselageHeight] = ...
-		ballParkEstimate(numPax, passengerConfiguration, numBatts, areaDensity)
+		ballParkEstimate(numPax, passengerConfiguration, numBatts, areaDensity);
     
 		% propulsion system estimate
 		propEst = propulsionEstimate(passengerLoadedMass * units.G_2_KG);

@@ -30,7 +30,7 @@ function[emptyFuselageWeight, passengerLoadedWeight, fuselageLength, fuselageWid
 	    end
 	end
 
-	figure();
+	figure('name', [num2str(numPassengers) ' Pax Distribution']);
 	hist(passengerDiameters,[27 32 38 45 49]);
 
 	%passengers added in groups of 2 or 4
@@ -67,7 +67,7 @@ function[emptyFuselageWeight, passengerLoadedWeight, fuselageLength, fuselageWid
 	%electronics info - so far accounts just for batteries - add in more
 	%space for different components later
     batDiameter = 14.5;
-	numBatRows = ceil((numBats*14.5)/passengerCompartmentWidth) % 14.5mm batteries fit per row with given fuselage width
+	numBatRows = ceil((numBats*14.5)/passengerCompartmentWidth); % 14.5mm batteries fit per row with given fuselage width
     electronicsBayLength = (batDiameter*numBatRows) + (1*units.IN_2_MM); %batteries
 
 	fuselageHeight = (3/2)*passengerCompartmentHeight; %assumes luggage compartment is half the area as passenger compartment

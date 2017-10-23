@@ -18,15 +18,15 @@ MAX_PAX_PAYLOAD_LAPS = 80 * 90 * 12; % [80 pax * 90oz payload * 12 laps]
 
 close all; % clear all plots
 
-paxList = [6, 20, 40, 60, 80, 100, 140, 160]; % list of passenger configurations to try
+paxList = [10, 16, 20, 40, 60, 80, 100, 140]; % list of passenger configurations to try
 
 for i = 1:length(paxList)
 	pax = paxList(i);
-
+	fprintf('========== %d PASSENGERS ==========\n', pax);
 	% fly M1
 	fprintf('===== MISSION 1 =====\n')
 	geom = defineAircraftGeometry(['DBF18-' num2str(pax) '-empty']);
-	mission1Results(i) = flyCourse(geom, 1, simParams, true)
+	mission1Results(i) = flyCourse(geom, 1, simParams, true);
 	mission1Scores(i) = 1.0;
 	fprintf('Mission 1 Complete\nScore: %.2f\n', mission1Scores(i))
     
@@ -52,7 +52,7 @@ end
 totalMissionScores = mission1Scores + mission2Scores + mission3Scores;
 competitionScoreMult = totalMissionScores ./ rac;
 
-figure();
+figure('name', 'Scoring');
 subplot(5, 1, 1);
 plot(paxList, mission2Scores);
 ylabel('M2')
