@@ -67,8 +67,8 @@ function[emptyFuselageWeight, passengerLoadedWeight, fuselageLength, fuselageWid
 	%electronics info - so far accounts just for batteries - add in more
 	%space for different components later
     batDiameter = 14.5;
-	batsPerRow = floor((numBats*14.5)/passengerCompartmentWidth); % 14.5mm batteries fit per row with given fuselage width
-    electronicsBayLength = (batDiameter*ceil(numBats/batsPerRow)) + (1*units.IN_2_MM); %batteries
+	numBatRows = ceil((numBats*14.5)/passengerCompartmentWidth) % 14.5mm batteries fit per row with given fuselage width
+    electronicsBayLength = (batDiameter*numBatRows) + (1*units.IN_2_MM); %batteries
 
 	fuselageHeight = (3/2)*passengerCompartmentHeight; %assumes luggage compartment is half the area as passenger compartment
 	fuselageLength = passengerCompartmentLength + electronicsBayLength;
